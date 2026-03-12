@@ -792,6 +792,66 @@
     <div style="text-align:center;margin-top:16px">
       <a onclick="showForgotPage()" style="font-size:13px;color:var(--text3);cursor:pointer;text-decoration:none" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">Mot de passe oublié ?</a>
     </div>
+    <div style="text-align:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+      <span style="font-size:13px;color:var(--text3)">Pas encore de compte ? </span>
+      <a onclick="showRegisterPage()" style="font-size:13px;color:var(--accent2);cursor:pointer;font-weight:600" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">S'inscrire comme bénévole</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== REGISTER PAGE ===== -->
+<div id="register-page" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(34,197,94,.08) 0%,transparent 50%),var(--bg);padding:20px">
+  <div class="login-card" style="max-width:480px">
+    <div class="login-logo">
+      <div class="logo-icon">🏔️</div>
+      <span class="logo-text">EventOps</span>
+    </div>
+    <h1 class="login-title">Créer un compte</h1>
+    <p class="login-subtitle">Inscris-toi pour participer aux événements sportifs outdoor</p>
+    <div id="register-error" class="error-msg"></div>
+    <div id="register-success" class="success-msg"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label>Prénom *</label>
+        <input type="text" id="reg-firstname" placeholder="Jean">
+      </div>
+      <div class="form-group">
+        <label>Nom *</label>
+        <input type="text" id="reg-lastname" placeholder="Dupont">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Email *</label>
+      <input type="email" id="reg-email" placeholder="votre@email.fr" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Téléphone *</label>
+      <input type="tel" id="reg-phone" placeholder="06 12 34 56 78">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label>Mot de passe *</label>
+        <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label>Confirmer *</label>
+        <input type="password" id="reg-password-confirm" placeholder="••••••••" autocomplete="new-password">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Club sportif <span style="color:var(--text3);font-weight:400">(facultatif)</span></label>
+      <input type="text" id="reg-club" placeholder="Ex: Triathlon Club Verdon">
+    </div>
+    <div class="form-group">
+      <label>Commentaire <span style="color:var(--text3);font-weight:400">(facultatif)</span></label>
+      <textarea id="reg-comment" placeholder="Ex: disponible uniquement le matin..." style="min-height:60px"></textarea>
+    </div>
+    <button class="btn btn-primary" id="reg-btn" onclick="handleRegister()">
+      <span>Créer mon compte</span>
+    </button>
+    <div style="text-align:center;margin-top:16px">
+      <a onclick="showLoginFromRegister()" style="font-size:13px;color:var(--text3);cursor:pointer" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">← Retour à la connexion</a>
+    </div>
   </div>
 </div>
 
@@ -872,8 +932,20 @@
         </div>
         <div class="nav-section" id="nav-volunteer-section" style="display:none">
           <div class="nav-section-title">Mon espace</div>
+          <button class="nav-item" onclick="showPage('my-events')" id="nav-my-events">
+            <span class="icon">📅</span> Mes événements
+          </button>
+          <button class="nav-item" onclick="showPage('event-catalog')" id="nav-event-catalog">
+            <span class="icon">🔍</span> Catalogue
+          </button>
           <button class="nav-item" onclick="showPage('my-missions')" id="nav-my-missions">
             <span class="icon">🎯</span> Mes missions
+          </button>
+        </div>
+        <div class="nav-section" id="nav-admin-pending-section" style="display:none">
+          <div class="nav-section-title">Inscriptions</div>
+          <button class="nav-item" onclick="showPage('pending-requests')" id="nav-pending-requests">
+            <span class="icon">🔔</span> Demandes <span id="pending-badge" style="background:var(--red);color:white;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;display:none">0</span>
           </button>
         </div>
       </nav>
@@ -1124,6 +1196,50 @@
         <div id="my-missions-content"><div class="loading"><div class="spinner"></div></div></div>
       </div>
 
+      <!-- MES ÉVÉNEMENTS (bénévole) -->
+      <div class="page" id="page-my-events">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Mes événements</h1>
+            <p class="page-subtitle">Les événements auxquels vous participez</p>
+          </div>
+        </div>
+        <div id="my-events-content"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+
+      <!-- CATALOGUE ÉVÉNEMENTS (bénévole) -->
+      <div class="page" id="page-event-catalog">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Catalogue des événements</h1>
+            <p class="page-subtitle">Découvrez les événements et demandez à y participer</p>
+          </div>
+        </div>
+        <div id="event-catalog-content"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+
+      <!-- DEMANDES EN ATTENTE (admin/organisateur) -->
+      <div class="page" id="page-pending-requests">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Demandes d'inscription</h1>
+            <p class="page-subtitle">Bénévoles en attente de validation</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Bénévole</th><th>Email</th><th>Téléphone</th><th>Événement</th><th>Club</th><th>Commentaire</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="pending-requests-body">
+                <tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -1330,9 +1446,13 @@ function updateUserUI() {
 
   // Adapter nav selon le rôle
   const isVolunteer = currentProfile.role === 'volunteer';
+  const isAdminOrOrga = currentProfile.role === 'admin' || currentProfile.role === 'organizer';
   document.getElementById('nav-organizer-section').style.display = isVolunteer ? 'none' : '';
   document.getElementById('nav-volunteer-section').style.display = isVolunteer ? '' : 'none';
   document.getElementById('btn-create-event').style.display = isVolunteer ? 'none' : '';
+
+  // Badge demandes en attente pour admin/orga
+  if (isAdminOrOrga) loadPendingBadge();
 }
 
 // ===== AUTH =====
@@ -1359,6 +1479,253 @@ async function handleLogin() {
 
 async function handleLogout() {
   await sb.auth.signOut();
+}
+
+// ===== REGISTER =====
+function showRegisterPage() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('register-page').style.display = 'flex';
+  document.getElementById('register-error').style.display = 'none';
+  document.getElementById('register-success').style.display = 'none';
+  ['reg-firstname','reg-lastname','reg-email','reg-phone','reg-password','reg-password-confirm','reg-club','reg-comment'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+}
+
+function showLoginFromRegister() {
+  document.getElementById('register-page').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
+async function handleRegister() {
+  const firstname = document.getElementById('reg-firstname').value.trim();
+  const lastname = document.getElementById('reg-lastname').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm = document.getElementById('reg-password-confirm').value;
+  const club = document.getElementById('reg-club').value.trim();
+  const comment = document.getElementById('reg-comment').value.trim();
+  const btn = document.getElementById('reg-btn');
+  const errEl = document.getElementById('register-error');
+  const successEl = document.getElementById('register-success');
+
+  errEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  // Validations
+  if (!firstname || !lastname) { errEl.textContent = 'Le prénom et le nom sont obligatoires'; errEl.style.display = 'block'; return; }
+  if (!email) { errEl.textContent = 'L\'email est obligatoire'; errEl.style.display = 'block'; return; }
+  if (!phone) { errEl.textContent = 'Le téléphone est obligatoire'; errEl.style.display = 'block'; return; }
+  if (!password || password.length < 6) { errEl.textContent = 'Le mot de passe doit contenir au moins 6 caractères'; errEl.style.display = 'block'; return; }
+  if (password !== confirm) { errEl.textContent = 'Les mots de passe ne correspondent pas'; errEl.style.display = 'block'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Création du compte...';
+
+  // Créer le compte Supabase Auth
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { first_name: firstname, last_name: lastname },
+      emailRedirectTo: 'https://stephanedallier.github.io/eventops/'
+    }
+  });
+
+  if (error) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>Créer mon compte</span>';
+    errEl.textContent = error.message.includes('already') ? 'Cette adresse email est déjà utilisée' : error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Mettre à jour le profil avec les infos complémentaires
+  if (data.user) {
+    await sb.from('profiles').upsert({
+      id: data.user.id,
+      first_name: firstname,
+      last_name: lastname,
+      phone,
+      club: club || null,
+      comment: comment || null,
+      role: 'volunteer',
+      is_active: true
+    });
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>Créer mon compte</span>';
+  successEl.innerHTML = '✅ Compte créé ! <strong>Vérifiez votre boîte mail</strong> et cliquez sur le lien de confirmation avant de vous connecter.';
+  successEl.style.display = 'block';
+}
+
+// ===== MES ÉVÉNEMENTS (bénévole) =====
+async function loadMyEvents() {
+  const container = document.getElementById('my-events-content');
+
+  const { data: evVols } = await sb.from('event_volunteers')
+    .select('*, events(id, name, start_date, end_date, location, status, description)')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  if (!evVols || evVols.length === 0) {
+    container.innerHTML = `
+      <div class="card">
+        <div class="empty-state">
+          <div class="empty-icon">📅</div>
+          <p>Vous n'êtes inscrit à aucun événement</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="showPage('event-catalog')">🔍 Voir le catalogue</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="planning-grid">` + evVols.map(ev => {
+    const e = ev.events;
+    const statusMap = { pending: { label: 'En attente', color: 'var(--orange)' }, accepted: { label: 'Accepté', color: 'var(--green)' }, refused: { label: 'Refusé', color: 'var(--red)' } };
+    const s = statusMap[ev.status] || { label: ev.status, color: 'var(--text2)' };
+    return `
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div style="font-weight:600;font-size:16px">${e?.name || '—'}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">${formatDate(e?.start_date)}${e?.end_date ? ' → ' + formatDate(e.end_date) : ''} ${e?.location ? '· ' + e.location : ''}</div>
+          </div>
+          <span style="font-size:13px;font-weight:600;color:${s.color}">${s.label}</span>
+        </div>
+        ${e?.description ? `<div style="padding:12px 20px;font-size:13px;color:var(--text2)">${e.description}</div>` : ''}
+        ${ev.status === 'accepted' ? `<div style="padding:8px 20px 16px"><button class="btn btn-secondary btn-sm" onclick="openEventDetail('${e.id}')">👁 Voir le planning</button></div>` : ''}
+        ${ev.status === 'pending' ? `<div style="padding:8px 20px 16px"><button class="btn btn-danger btn-sm" onclick="cancelRegistration('${ev.id}')">✕ Annuler la demande</button></div>` : ''}
+      </div>`;
+  }).join('') + '</div>';
+}
+
+async function cancelRegistration(evVolId) {
+  if (!confirm('Annuler votre demande d\'inscription ?')) return;
+  await sb.from('event_volunteers').delete().eq('id', evVolId);
+  toast('Demande annulée', 'success');
+  loadMyEvents();
+}
+
+// ===== CATALOGUE ÉVÉNEMENTS (bénévole) =====
+async function loadEventCatalog() {
+  const container = document.getElementById('event-catalog-content');
+
+  // Récupérer les événements publiés
+  const { data: events } = await sb.from('events')
+    .select('*')
+    .eq('status', 'published')
+    .order('start_date');
+
+  // Récupérer les inscriptions du bénévole
+  const { data: myVols } = await sb.from('event_volunteers')
+    .select('event_id, status')
+    .eq('user_id', currentUser.id);
+
+  const myEventIds = new Set((myVols || []).map(v => v.event_id));
+  const myEventStatus = {};
+  (myVols || []).forEach(v => { myEventStatus[v.event_id] = v.status; });
+
+  if (!events || events.length === 0) {
+    container.innerHTML = `<div class="card"><div class="empty-state"><div class="empty-icon">🔍</div><p>Aucun événement disponible pour le moment</p></div></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="planning-grid">` + events.map(e => {
+    const isRegistered = myEventIds.has(e.id);
+    const regStatus = myEventStatus[e.id];
+    let actionBtn = '';
+    if (isRegistered && regStatus === 'pending') {
+      actionBtn = `<button class="btn btn-secondary btn-sm" disabled>⏳ Demande en attente</button>`;
+    } else if (isRegistered && regStatus === 'accepted') {
+      actionBtn = `<button class="btn btn-success btn-sm" disabled>✅ Inscrit</button>`;
+    } else if (isRegistered && regStatus === 'refused') {
+      actionBtn = `<button class="btn btn-danger btn-sm" disabled>❌ Refusé</button>`;
+    } else {
+      actionBtn = `<button class="btn btn-primary btn-sm" onclick="requestRegistration('${e.id}')">+ Demander à participer</button>`;
+    }
+    return `
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div style="font-weight:600;font-size:16px">${e.name}</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px">${formatDate(e.start_date)}${e.end_date ? ' → ' + formatDate(e.end_date) : ''} ${e.location ? '· ' + e.location : ''}</div>
+          </div>
+          ${statusBadge(e.status)}
+        </div>
+        ${e.description ? `<div style="padding:12px 20px;font-size:13px;color:var(--text2)">${e.description}</div>` : ''}
+        <div style="padding:8px 20px 16px">${actionBtn}</div>
+      </div>`;
+  }).join('') + '</div>';
+}
+
+async function requestRegistration(eventId) {
+  const { error } = await sb.from('event_volunteers').insert({
+    event_id: eventId,
+    user_id: currentUser.id,
+    status: 'pending'
+  });
+  if (error) {
+    toast('Erreur lors de la demande', 'error');
+    return;
+  }
+  toast('Demande envoyée ! En attente de validation.', 'success');
+  loadEventCatalog();
+  loadPendingBadge();
+}
+
+// ===== DEMANDES EN ATTENTE (admin) =====
+async function loadPendingRequests() {
+  const tbody = document.getElementById('pending-requests-body');
+  const { data } = await sb.from('event_volunteers')
+    .select('*, profiles(first_name, last_name, phone, club, comment), events(name)')
+    .eq('status', 'pending')
+    .order('created_at');
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🎉</div><p>Aucune demande en attente</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(ev => `
+    <tr>
+      <td><strong>${ev.profiles?.first_name || ''} ${ev.profiles?.last_name || ''}</strong></td>
+      <td style="font-size:13px;color:var(--text2)">${ev.profiles?.phone || '—'}</td>
+      <td style="font-size:13px;color:var(--text2)">${ev.profiles?.phone || '—'}</td>
+      <td><strong>${ev.events?.name || '—'}</strong></td>
+      <td style="font-size:13px;color:var(--text2)">${ev.profiles?.club || '—'}</td>
+      <td style="font-size:13px;color:var(--text2);max-width:200px">${ev.profiles?.comment || '—'}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-success btn-sm" onclick="handleRequest('${ev.id}', 'accepted')">✅ Accepter</button>
+          <button class="btn btn-danger btn-sm" onclick="handleRequest('${ev.id}', 'refused')">❌ Refuser</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function handleRequest(evVolId, status) {
+  const label = status === 'accepted' ? 'Accepter' : 'Refuser';
+  if (!confirm(`${label} cette demande ?`)) return;
+  const { error } = await sb.from('event_volunteers').update({ status }).eq('id', evVolId);
+  if (!error) {
+    toast(status === 'accepted' ? 'Bénévole accepté ✅' : 'Demande refusée', status === 'accepted' ? 'success' : 'error');
+    loadPendingRequests();
+    loadPendingBadge();
+  }
+}
+
+async function loadPendingBadge() {
+  if (currentProfile?.role !== 'admin' && currentProfile?.role !== 'organizer') return;
+  const { data } = await sb.from('event_volunteers').select('id').eq('status', 'pending');
+  const count = data?.length || 0;
+  const badge = document.getElementById('pending-badge');
+  const section = document.getElementById('nav-admin-pending-section');
+  if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline' : 'none'; }
+  if (section) section.style.display = '';
 }
 
 // ===== FORGOT / RESET PASSWORD =====
@@ -1500,6 +1867,9 @@ function showPage(pageId) {
   else if (pageId === 'events') loadEventsList();
   else if (pageId === 'volunteers') loadVolunteersList();
   else if (pageId === 'my-missions') loadMyMissions();
+  else if (pageId === 'my-events') loadMyEvents();
+  else if (pageId === 'event-catalog') loadEventCatalog();
+  else if (pageId === 'pending-requests') loadPendingRequests();
 }
 
 // ===== DASHBOARD =====
