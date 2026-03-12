@@ -735,35 +735,6 @@
       color: var(--red);
       border-style: dashed;
     }
-
-    /* ===== FILTRES STATUT ===== */
-    .filter-bar { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center; }
-    .filter-label { font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px; }
-    .filter-btn { padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);font-family:'Sora',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s; }
-    .filter-btn:hover { border-color:var(--accent);color:var(--text); }
-    .filter-btn.active { background:var(--accent);border-color:var(--accent);color:white; }
-
-    /* ===== PROGRESS BAR ===== */
-    .progress-wrap { display:flex;align-items:center;gap:8px;min-width:120px; }
-    .progress-bar { flex:1;height:6px;background:var(--bg3);border-radius:10px;overflow:hidden; }
-    .progress-fill { height:100%;border-radius:10px;transition:width 0.3s; }
-    .progress-fill.low { background:var(--red); }
-    .progress-fill.mid { background:var(--orange); }
-    .progress-fill.high { background:var(--green); }
-    .progress-pct { font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text2);min-width:32px;text-align:right; }
-
-    /* ===== STATS DÉTAIL ÉVÉNEMENT ===== */
-    .detail-stats { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border); }
-    .detail-stat { text-align:center; }
-    .detail-stat-value { font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace; }
-    .detail-stat-label { font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px; }
-
-    /* Badges supplémentaires */
-    .badge-archived { background:rgba(100,116,139,0.2);color:#94a3b8;border:1px solid rgba(100,116,139,0.3); }
-    .btn-archive { background:rgba(234,179,8,0.12);color:var(--yellow);border:1px solid rgba(234,179,8,0.3); }
-    .btn-archive:hover { background:rgba(234,179,8,0.22); }
-
-    @media (max-width:900px) { .detail-stats { grid-template-columns:repeat(2,1fr); } }
   </style>
 </head>
 <body>
@@ -788,6 +759,58 @@
     </div>
     <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">
       <span>Se connecter</span>
+    </button>
+    <div style="text-align:center;margin-top:16px">
+      <a onclick="showForgotPage()" style="font-size:13px;color:var(--text3);cursor:pointer;text-decoration:none" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">Mot de passe oublié ?</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FORGOT PASSWORD PAGE ===== -->
+<div id="forgot-page" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.12) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(34,197,94,.08) 0%,transparent 50%),var(--bg)">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🏔️</div>
+      <span class="logo-text">EventOps</span>
+    </div>
+    <h1 class="login-title">Mot de passe oublié</h1>
+    <p class="login-subtitle">Saisis ton email pour recevoir un lien de réinitialisation</p>
+    <div id="forgot-error" class="error-msg"></div>
+    <div id="forgot-success" class="success-msg"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="forgot-email" placeholder="votre@email.fr" autocomplete="email">
+    </div>
+    <button class="btn btn-primary" id="forgot-btn" onclick="handleForgotPassword()">
+      <span>Envoyer le lien</span>
+    </button>
+    <div style="text-align:center;margin-top:16px">
+      <a onclick="showLoginFromForgot()" style="font-size:13px;color:var(--text3);cursor:pointer" onmouseover="this.style.color='var(--accent2)'" onmouseout="this.style.color='var(--text3)'">← Retour à la connexion</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESET PASSWORD PAGE ===== -->
+<div id="reset-page" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.12) 0%,transparent 60%),var(--bg)">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🏔️</div>
+      <span class="logo-text">EventOps</span>
+    </div>
+    <h1 class="login-title">Nouveau mot de passe</h1>
+    <p class="login-subtitle">Choisis ton nouveau mot de passe</p>
+    <div id="reset-error" class="error-msg"></div>
+    <div id="reset-success" class="success-msg"></div>
+    <div class="form-group">
+      <label>Nouveau mot de passe</label>
+      <input type="password" id="reset-password" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label>Confirmer le mot de passe</label>
+      <input type="password" id="reset-password-confirm" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <button class="btn btn-primary" id="reset-btn" onclick="handleResetPassword()">
+      <span>Enregistrer le mot de passe</span>
     </button>
   </div>
 </div>
@@ -905,18 +928,9 @@
             <h1 class="page-title">Événements</h1>
             <p class="page-subtitle">Gérez tous vos événements sportifs</p>
           </div>
-          <button class="btn btn-primary" onclick="openModal('event-modal')" id="btn-new-event" style="display:none">
+          <button class="btn btn-primary" onclick="openModal('event-modal')">
             + Nouvel événement
           </button>
-        </div>
-        <!-- Filtres statut -->
-        <div class="filter-bar">
-          <span class="filter-label">Filtrer :</span>
-          <button class="filter-btn active" onclick="filterEvents('all', this)">Tous</button>
-          <button class="filter-btn" onclick="filterEvents('draft', this)">Brouillon</button>
-          <button class="filter-btn" onclick="filterEvents('published', this)">Publié</button>
-          <button class="filter-btn" onclick="filterEvents('completed', this)">Terminé</button>
-          <button class="filter-btn" onclick="filterEvents('archived', this)">Archivé</button>
         </div>
         <div class="card">
           <div class="table-wrap">
@@ -927,14 +941,11 @@
                   <th>Dates</th>
                   <th>Lieu</th>
                   <th>Statut</th>
-                  <th>Postes</th>
-                  <th>Bénévoles</th>
-                  <th>Remplissage</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="events-list-body">
-                <tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -950,52 +961,23 @@
         </div>
         <div class="event-detail-header">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-                <h1 class="page-title" id="detail-name">—</h1>
-                <span id="detail-status-wrap"></span>
-              </div>
+            <div>
+              <h1 class="page-title" id="detail-name">—</h1>
               <div class="event-meta">
                 <div class="event-meta-item">📅 <span id="detail-dates">—</span></div>
                 <div class="event-meta-item">📍 <span id="detail-location">—</span></div>
+                <div class="event-meta-item" id="detail-status-wrap"></div>
               </div>
               <p style="margin-top:12px;color:var(--text2);font-size:14px" id="detail-description"></p>
-              <!-- Stats temps réel -->
-              <div class="detail-stats" id="detail-stats-block">
-                <div class="detail-stat">
-                  <div class="detail-stat-value" id="dstat-positions">—</div>
-                  <div class="detail-stat-label">Postes</div>
-                </div>
-                <div class="detail-stat">
-                  <div class="detail-stat-value" id="dstat-volunteers">—</div>
-                  <div class="detail-stat-label">Bénévoles</div>
-                </div>
-                <div class="detail-stat">
-                  <div class="detail-stat-value" id="dstat-assignments">—</div>
-                  <div class="detail-stat-label">Affectés</div>
-                </div>
-                <div class="detail-stat">
-                  <div class="detail-stat-value" id="dstat-fill">—</div>
-                  <div class="detail-stat-label">Remplissage</div>
-                </div>
-              </div>
             </div>
-            <!-- Actions Admin -->
-            <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end" id="event-detail-actions" style="display:none">
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn btn-secondary btn-sm" onclick="editCurrentEvent()">✏️ Modifier</button>
-                <button class="btn btn-archive btn-sm" onclick="archiveCurrentEvent()">📦 Archiver</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteCurrentEvent()">🗑 Supprimer</button>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:12px;color:var(--text3)">Statut :</span>
-                <select class="btn btn-secondary btn-sm" onchange="updateEventStatus(this.value)" id="status-select" style="cursor:pointer">
-                  <option value="draft">Brouillon</option>
-                  <option value="published">Publié</option>
-                  <option value="completed">Terminé</option>
-                  <option value="archived">Archivé</option>
-                </select>
-              </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="editCurrentEvent()">✏️ Modifier</button>
+              <select class="btn btn-secondary btn-sm" onchange="updateEventStatus(this.value)" id="status-select" style="cursor:pointer">
+                <option value="draft">Brouillon</option>
+                <option value="published">Publié</option>
+                <option value="completed">Terminé</option>
+                <option value="archived">Archivé</option>
+              </select>
             </div>
           </div>
         </div>
@@ -1108,21 +1090,6 @@
         <div class="form-group">
           <label>Date de fin</label>
           <input type="date" id="event-end-date">
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="form-group">
-          <label>Statut</label>
-          <select id="event-status">
-            <option value="draft">Brouillon</option>
-            <option value="published">Publié</option>
-            <option value="completed">Terminé</option>
-            <option value="archived">Archivé</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Nb bénévoles max (optionnel)</label>
-          <input type="number" id="event-max-volunteers" placeholder="Ex: 50" min="1">
         </div>
       </div>
     </div>
@@ -1251,10 +1218,15 @@ async function init() {
   }
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN') {
+      // Ne pas rediriger vers l'app si on est en train de reset le mot de passe
+      if (document.getElementById('reset-page').style.display === 'flex') return;
       await loadUserProfile(session.user);
       showApp();
     } else if (event === 'SIGNED_OUT') {
       showLoginPage();
+    } else if (event === 'PASSWORD_RECOVERY') {
+      // L'utilisateur a cliqué le lien dans l'email → afficher la page reset
+      showResetPage();
     }
   });
 }
@@ -1306,6 +1278,118 @@ async function handleLogout() {
   await sb.auth.signOut();
 }
 
+// ===== FORGOT PASSWORD =====
+function showForgotPage() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('forgot-page').style.display = 'flex';
+  document.getElementById('forgot-email').value = '';
+  document.getElementById('forgot-error').style.display = 'none';
+  document.getElementById('forgot-success').style.display = 'none';
+}
+
+function showLoginFromForgot() {
+  document.getElementById('forgot-page').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
+function showResetPage() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('forgot-page').style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('reset-page').style.display = 'flex';
+  document.getElementById('reset-error').style.display = 'none';
+  document.getElementById('reset-success').style.display = 'none';
+  document.getElementById('reset-password').value = '';
+  document.getElementById('reset-password-confirm').value = '';
+}
+
+async function handleForgotPassword() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const btn = document.getElementById('forgot-btn');
+  const errEl = document.getElementById('forgot-error');
+  const successEl = document.getElementById('forgot-success');
+
+  errEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if (!email) {
+    errEl.textContent = 'Veuillez saisir votre adresse email';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Envoi...';
+
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://stephanedallier.github.io/eventops/'
+  });
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>Envoyer le lien</span>';
+
+  if (error) {
+    errEl.textContent = 'Erreur lors de l\'envoi. Vérifiez l\'adresse email.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  successEl.textContent = '✅ Email envoyé ! Vérifiez votre boîte mail (et les spams).';
+  successEl.style.display = 'block';
+  document.getElementById('forgot-email').value = '';
+}
+
+async function handleResetPassword() {
+  const password = document.getElementById('reset-password').value;
+  const confirm = document.getElementById('reset-password-confirm').value;
+  const btn = document.getElementById('reset-btn');
+  const errEl = document.getElementById('reset-error');
+  const successEl = document.getElementById('reset-success');
+
+  errEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if (!password || password.length < 6) {
+    errEl.textContent = 'Le mot de passe doit contenir au moins 6 caractères';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (password !== confirm) {
+    errEl.textContent = 'Les mots de passe ne correspondent pas';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Enregistrement...';
+
+  const { error } = await sb.auth.updateUser({ password });
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>Enregistrer le mot de passe</span>';
+
+  if (error) {
+    errEl.textContent = 'Erreur : ' + error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  successEl.textContent = '✅ Mot de passe mis à jour ! Redirection...';
+  successEl.style.display = 'block';
+
+  // Rediriger vers l'app après 2 secondes
+  setTimeout(async () => {
+    document.getElementById('reset-page').style.display = 'none';
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await loadUserProfile(session.user);
+      showApp();
+    } else {
+      showLoginPage();
+    }
+  }, 2000);
+}
+
 document.getElementById('login-password').addEventListener('keypress', e => {
   if (e.key === 'Enter') handleLogin();
 });
@@ -1351,93 +1435,33 @@ async function loadDashboard() {
   await loadEventsTable('events-table-body');
 }
 
-// Variable pour stocker tous les événements (pour le filtre côté client)
-let allEvents = [];
-let currentFilter = 'all';
-
 async function loadEventsTable(tbodyId) {
   const tbody = document.getElementById(tbodyId);
-  const isAdmin = currentProfile?.role === 'admin';
+  const { data: events, error } = await sb.from('events').select('*').order('start_date', { ascending: false });
 
-  // Charger événements + compteurs postes, bénévoles, affectations
-  const { data: events } = await sb.from('events').select(`
-    *,
-    positions(id, volunteers_required, shifts(id, assignments(id))),
-    event_volunteers(id)
-  `).order('start_date', { ascending: false });
-
-  allEvents = events || [];
-  renderEventsTable(tbodyId, allEvents, isAdmin);
-}
-
-function renderEventsTable(tbodyId, events, isAdmin) {
-  const tbody = document.getElementById(tbodyId);
-  const filtered = currentFilter === 'all' ? events : events.filter(e => e.status === currentFilter);
-
-  if (!filtered || filtered.length === 0) {
-    const msg = currentFilter === 'all' ? 'Aucun événement' : `Aucun événement "${currentFilter}"`;
-    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">📅</div><p>${msg}</p></div></td></tr>`;
+  if (!events || events.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📅</div><p>Aucun événement</p></div></td></tr>`;
     return;
   }
 
-  tbody.innerHTML = filtered.map(e => {
-    // Calcul compteurs
-    const positions = e.positions || [];
-    const nbPostes = positions.length;
-    const nbVolunteers = (e.event_volunteers || []).length;
-
-    // Taux remplissage : total assignés / total requis
-    let totalRequired = 0, totalAssigned = 0;
-    positions.forEach(pos => {
-      totalRequired += pos.volunteers_required || 0;
-      (pos.shifts || []).forEach(sh => {
-        totalAssigned += (sh.assignments || []).length;
-      });
-    });
-    const pct = totalRequired > 0 ? Math.round((totalAssigned / totalRequired) * 100) : 0;
-    const fillClass = pct >= 80 ? 'high' : pct >= 40 ? 'mid' : 'low';
-
-    return `
+  tbody.innerHTML = events.map(e => `
     <tr>
       <td><strong style="cursor:pointer;color:var(--accent2)" onclick="openEventDetail('${e.id}')">${e.name}</strong></td>
-      <td style="white-space:nowrap">${formatDate(e.start_date)}${e.end_date ? '<br><span style="color:var(--text3);font-size:12px">→ ' + formatDate(e.end_date) + '</span>' : ''}</td>
-      <td style="color:var(--text2);font-size:13px">${e.location || '—'}</td>
+      <td>${formatDate(e.start_date)}${e.end_date ? ' → ' + formatDate(e.end_date) : ''}</td>
+      <td>${e.location || '—'}</td>
       <td>${statusBadge(e.status)}</td>
-      <td style="text-align:center;font-family:'JetBrains Mono',monospace">${nbPostes}</td>
-      <td style="text-align:center;font-family:'JetBrains Mono',monospace">${nbVolunteers}</td>
       <td>
-        <div class="progress-wrap">
-          <div class="progress-bar"><div class="progress-fill ${fillClass}" style="width:${pct}%"></div></div>
-          <span class="progress-pct">${pct}%</span>
-        </div>
-      </td>
-      <td>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <div style="display:flex;gap:6px">
           <button class="btn btn-secondary btn-sm" onclick="openEventDetail('${e.id}')">👁 Voir</button>
-          ${isAdmin ? `<button class="btn btn-secondary btn-sm" onclick="openEditEvent('${e.id}')">✏️</button>` : ''}
-          ${isAdmin && e.status !== 'archived' ? `<button class="btn btn-archive btn-sm" onclick="archiveEvent('${e.id}')">📦</button>` : ''}
-          ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteEvent('${e.id}', '${e.name.replace(/'/g, "\\'")}')">🗑</button>` : ''}
+          <button class="btn btn-secondary btn-sm" onclick="openEditEvent('${e.id}')">✏️</button>
         </div>
       </td>
-    </tr>`;
-  }).join('');
-}
-
-function filterEvents(status, btn) {
-  currentFilter = status;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const isAdmin = currentProfile?.role === 'admin';
-  renderEventsTable('events-list-body', allEvents, isAdmin);
+    </tr>
+  `).join('');
 }
 
 // ===== EVENTS LIST =====
 async function loadEventsList() {
-  const isAdmin = currentProfile?.role === 'admin';
-  const btnNew = document.getElementById('btn-new-event');
-  if (btnNew) btnNew.style.display = isAdmin ? 'inline-flex' : 'none';
-  currentFilter = 'all';
-  document.querySelectorAll('.filter-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
   await loadEventsTable('events-list-body');
 }
 
@@ -1458,38 +1482,9 @@ async function openEventDetail(eventId) {
   document.getElementById('detail-description').textContent = event.description || '';
   document.getElementById('status-select').value = event.status;
 
-  // Afficher les actions selon le rôle
-  const actionsEl = document.getElementById('event-detail-actions');
-  if (actionsEl) actionsEl.style.display = currentProfile?.role === 'admin' ? 'flex' : 'none';
-
-  // Stats temps réel
-  await refreshDetailStats();
-
   // Reset tabs
   showTab('tab-positions', false);
   loadPositions();
-}
-
-async function refreshDetailStats() {
-  const { data: positions } = await sb.from('positions')
-    .select('id, volunteers_required, shifts(id, assignments(id))')
-    .eq('event_id', currentEventId);
-  const { data: evVols } = await sb.from('event_volunteers').select('id').eq('event_id', currentEventId);
-
-  const nbPostes = positions?.length || 0;
-  const nbVols = evVols?.length || 0;
-  let totalRequired = 0, totalAssigned = 0;
-  (positions || []).forEach(pos => {
-    totalRequired += pos.volunteers_required || 0;
-    (pos.shifts || []).forEach(sh => { totalAssigned += (sh.assignments || []).length; });
-  });
-  const pct = totalRequired > 0 ? Math.round((totalAssigned / totalRequired) * 100) : 0;
-
-  document.getElementById('dstat-positions').textContent = nbPostes;
-  document.getElementById('dstat-volunteers').textContent = nbVols;
-  document.getElementById('dstat-assignments').textContent = totalAssigned + ' / ' + totalRequired;
-  document.getElementById('dstat-fill').textContent = pct + '%';
-  document.getElementById('dstat-fill').style.color = pct >= 80 ? 'var(--green)' : pct >= 40 ? 'var(--orange)' : 'var(--red)';
 }
 
 function showTab(tabId, loadData = true) {
@@ -1528,8 +1523,6 @@ async function saveEvent() {
   const location = document.getElementById('event-location').value.trim();
   const start_date = document.getElementById('event-start-date').value;
   const end_date = document.getElementById('event-end-date').value;
-  const status = document.getElementById('event-status').value;
-  const max_volunteers = document.getElementById('event-max-volunteers').value;
   const errEl = document.getElementById('event-modal-error');
 
   errEl.style.display = 'none';
@@ -1539,20 +1532,17 @@ async function saveEvent() {
     return;
   }
 
-  const payload = {
-    name, description, location, start_date,
-    end_date: end_date || null,
-    status,
-    max_volunteers: max_volunteers ? parseInt(max_volunteers) : null
-  };
+  const payload = { name, description, location, start_date, end_date: end_date || null };
 
   let error;
   if (id) {
     ({ error } = await sb.from('events').update(payload).eq('id', id));
   } else {
     payload.created_by = currentUser.id;
+    payload.status = 'draft';
     const { data, error: err } = await sb.from('events').insert(payload).select().single();
     error = err;
+    // Ajouter l'organisateur
     if (!error && data) {
       await sb.from('event_organizers').insert({ event_id: data.id, user_id: currentUser.id });
     }
@@ -1567,11 +1557,11 @@ async function saveEvent() {
   closeModal('event-modal');
   toast(id ? 'Événement modifié' : 'Événement créé', 'success');
   loadDashboard();
-  loadEventsList();
-  if (currentEventId && id) openEventDetail(currentEventId);
+  if (currentEventId) openEventDetail(currentEventId);
 }
 
 function openEditEvent(eventId) {
+  openModal('event-modal');
   sb.from('events').select('*').eq('id', eventId).single().then(({ data }) => {
     document.getElementById('event-modal-title').textContent = 'Modifier l\'événement';
     document.getElementById('save-event-btn').textContent = 'Enregistrer';
@@ -1581,68 +1571,11 @@ function openEditEvent(eventId) {
     document.getElementById('event-location').value = data.location || '';
     document.getElementById('event-start-date').value = data.start_date;
     document.getElementById('event-end-date').value = data.end_date || '';
-    document.getElementById('event-status').value = data.status || 'draft';
-    document.getElementById('event-max-volunteers').value = data.max_volunteers || '';
-    openModal('event-modal');
   });
 }
 
 function editCurrentEvent() {
   if (currentEventId) openEditEvent(currentEventId);
-}
-
-async function archiveEvent(eventId) {
-  if (!confirm('Archiver cet événement ? Il restera accessible en lecture seule.')) return;
-  const { error } = await sb.from('events').update({ status: 'archived' }).eq('id', eventId);
-  if (!error) {
-    toast('Événement archivé', 'success');
-    loadEventsList();
-    loadDashboard();
-  }
-}
-
-async function archiveCurrentEvent() {
-  if (!currentEventId) return;
-  if (!confirm('Archiver cet événement ? Il restera accessible en lecture seule.')) return;
-  const { error } = await sb.from('events').update({ status: 'archived' }).eq('id', currentEventId);
-  if (!error) {
-    currentEvent.status = 'archived';
-    document.getElementById('detail-status-wrap').innerHTML = statusBadge('archived');
-    document.getElementById('status-select').value = 'archived';
-    toast('Événement archivé', 'success');
-  }
-}
-
-async function deleteEvent(eventId, eventName) {
-  if (!confirm(`Supprimer l'événement "${eventName}" ?\n\nCette action supprimera également tous les postes, créneaux et affectations associés. Elle est irréversible.`)) return;
-
-  const { data: positions } = await sb.from('positions').select('id').eq('event_id', eventId);
-  if (positions?.length) {
-    const posIds = positions.map(p => p.id);
-    const { data: shifts } = await sb.from('shifts').select('id').in('position_id', posIds);
-    if (shifts?.length) {
-      const shiftIds = shifts.map(s => s.id);
-      await sb.from('assignments').delete().in('shift_id', shiftIds);
-      await sb.from('shifts').delete().in('id', shiftIds);
-    }
-    await sb.from('positions').delete().in('id', posIds);
-  }
-  await sb.from('event_volunteers').delete().eq('event_id', eventId);
-  await sb.from('event_organizers').delete().eq('event_id', eventId);
-
-  const { error } = await sb.from('events').delete().eq('id', eventId);
-  if (error) { toast('Erreur lors de la suppression', 'error'); return; }
-
-  toast('Événement supprimé', 'success');
-  loadDashboard();
-  loadEventsList();
-}
-
-async function deleteCurrentEvent() {
-  if (currentEvent) {
-    await deleteEvent(currentEvent.id, currentEvent.name);
-    showPage('events');
-  }
 }
 
 // ===== POSITIONS =====
@@ -1692,8 +1625,6 @@ function openModal(id) {
     document.getElementById('event-location').value = '';
     document.getElementById('event-start-date').value = '';
     document.getElementById('event-end-date').value = '';
-    document.getElementById('event-status').value = 'draft';
-    document.getElementById('event-max-volunteers').value = '';
     document.getElementById('event-modal-error').style.display = 'none';
   }
   if (id === 'position-modal') {
