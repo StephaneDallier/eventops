@@ -2392,7 +2392,7 @@ async function addVolunteerToEvent() {
     return;
   }
 
-  const { error } = await sb.from('event_volunteers').insert({ event_id: currentEventId, user_id: userId, notes });
+  const { error } = await sb.from('event_volunteers').insert({ event_id: currentEventId, user_id: userId, notes, status: 'accepted' });
   if (error) {
     errEl.textContent = 'Erreur lors de l\'ajout';
     errEl.style.display = 'block';
