@@ -1523,12 +1523,19 @@ async function handleRegister() {
   btn.disabled = true;
   btn.innerHTML = '<div class="spinner"></div> Création du compte...';
 
-  // Créer le compte Supabase Auth
+  // Créer le compte Supabase Auth avec toutes les metadata
   const { data, error } = await sb.auth.signUp({
     email,
     password,
     options: {
-      data: { first_name: firstname, last_name: lastname },
+      data: {
+        first_name: firstname,
+        last_name: lastname,
+        phone,
+        club: club || null,
+        comment: comment || null,
+        role: 'volunteer'
+      },
       emailRedirectTo: 'https://stephanedallier.github.io/eventops/'
     }
   });
@@ -1541,9 +1548,9 @@ async function handleRegister() {
     return;
   }
 
-  // Mettre à jour le profil avec les infos complémentaires
+  // Tentative d'upsert profil (fonctionne si RLS le permet ou si trigger absent)
   if (data.user) {
-    await sb.from('profiles').upsert({
+    const { error: profileError } = await sb.from('profiles').upsert({
       id: data.user.id,
       first_name: firstname,
       last_name: lastname,
@@ -1552,7 +1559,11 @@ async function handleRegister() {
       comment: comment || null,
       role: 'volunteer',
       is_active: true
-    });
+    }, { onConflict: 'id' });
+
+    // Si le RLS bloque (confirmation email en attente), ce n'est pas bloquant
+    // Le trigger handle_new_user sur Supabase prend le relais
+    if (profileError) console.warn('Profil sera créé par trigger:', profileError.message);
   }
 
   btn.disabled = false;
