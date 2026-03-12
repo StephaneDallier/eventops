@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventOps — Gestion d'événements sportifs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ===== VARIABLES ===== */
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161e;
+      --bg3: #1a1e28;
+      --card: #1e2330;
+      --border: #2a2f3d;
+      --accent: #3b82f6;
+      --accent2: #60a5fa;
+      --green: #22c55e;
+      --orange: #f97316;
+      --red: #ef4444;
+      --yellow: #eab308;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== LOGIN PAGE ===== */
+    #login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(34,197,94,0.08) 0%, transparent 50%),
+                  var(--bg);
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow);
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .login-subtitle {
+      color: var(--text2);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    /* ===== FORMS ===== */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      font-size: 15px;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    select option { background: var(--bg2); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      width: 100%;
+      justify-content: center;
+      padding: 14px;
+      font-size: 15px;
+    }
+
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { background: var(--border); }
+
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      color: var(--red);
+      border: 1px solid rgba(239,68,68,0.3);
+    }
+
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+    .btn-success {
+      background: rgba(34,197,94,0.15);
+      color: var(--green);
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .btn-success:hover { background: rgba(34,197,94,0.25); }
+
+    .btn-sm { padding: 7px 14px; font-size: 13px; }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: var(--red);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .success-msg {
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    /* ===== APP LAYOUT ===== */
+    #app { display: none; }
+
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 240px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo .logo-icon { width: 36px; height: 36px; font-size: 16px; }
+    .sidebar-logo .logo-text { font-size: 18px; font-weight: 700; }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 12px;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0 8px;
+      margin-bottom: 8px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+
+    .nav-item.active {
+      background: rgba(59,130,246,0.15);
+      color: var(--accent2);
+    }
+
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 16px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-role {
+      font-size: 11px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      margin-left: 240px;
+      flex: 1;
+      padding: 32px;
+      max-width: calc(100vw - 240px);
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle { color: var(--text2); font-size: 14px; }
+
+    /* ===== STATS CARDS ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .stat-card.blue::before { background: var(--accent); }
+    .stat-card.green::before { background: var(--green); }
+    .stat-card.orange::before { background: var(--orange); }
+    .stat-card.yellow::before { background: var(--yellow); }
+
+    .stat-icon {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+    }
+
+    .stat-label { font-size: 13px; color: var(--text2); }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* ===== TABLE ===== */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 24px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px 24px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text3);
+    }
+
+    .empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state p { font-size: 14px; }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .badge-draft { background: rgba(100,116,139,0.2); color: var(--text3); border: 1px solid rgba(100,116,139,0.3); }
+    .badge-published { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .badge-completed { background: rgba(59,130,246,0.15); color: var(--accent2); border: 1px solid rgba(59,130,246,0.3); }
+    .badge-archived { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+    .badge-admin { background: rgba(249,115,22,0.15); color: var(--orange); border: 1px solid rgba(249,115,22,0.3); }
+    .badge-organizer { background: rgba(59,130,246,0.15); color: var(--accent2); border: 1px solid rgba(59,130,246,0.3); }
+    .badge-volunteer { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title { font-size: 18px; font-weight: 700; }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.2s;
+    }
+
+    .modal-close:hover { color: var(--text); }
+
+    .modal-body { padding: 24px; }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      padding: 20px 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== PAGES ===== */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== TOAST ===== */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease;
+      max-width: 360px;
+    }
+
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error { border-left: 3px solid var(--red); }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* ===== DETAIL EVENT ===== */
+    .event-detail-header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .event-meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .event-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--text2);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      border-radius: 7px;
+      border: none;
+      background: none;
+      color: var(--text2);
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .tab.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ===== LOADING ===== */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      color: var(--text3);
+      gap: 10px;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-content { margin-left: 0; max-width: 100vw; padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ===== BREADCRUMB ===== */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 20px;
+    }
+
+    .breadcrumb a {
+      color: var(--accent2);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    /* planning */
+    .planning-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .position-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .position-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .position-name { font-weight: 600; font-size: 15px; }
+
+    .shift-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .shift-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--accent2);
+      min-width: 160px;
+    }
+
+    .shift-volunteers {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .volunteer-chip {
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--accent2);
+    }
+
+    .volunteer-chip.empty {
+      background: rgba(239,68,68,0.08);
+      border-color: rgba(239,68,68,0.2);
+      color: var(--red);
+      border-style: dashed;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🏔️</div>
+      <span class="logo-text">EventOps</span>
+    </div>
+    <h1 class="login-title">Connexion</h1>
+    <p class="login-subtitle">Plateforme de gestion d'événements sportifs outdoor</p>
+    <div id="login-error" class="error-msg"></div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="votre@email.fr" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" id="login-btn" onclick="handleLogin()">
+      <span>Se connecter</span>
+    </button>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">🏔️</div>
+        <span class="logo-text">EventOps</span>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Principal</div>
+          <button class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+            <span class="icon">📊</span> Tableau de bord
+          </button>
+          <button class="nav-item" onclick="showPage('events')" id="nav-events">
+            <span class="icon">📅</span> Événements
+          </button>
+        </div>
+        <div class="nav-section" id="nav-organizer-section">
+          <div class="nav-section-title">Organisation</div>
+          <button class="nav-item" onclick="showPage('volunteers')" id="nav-volunteers">
+            <span class="icon">👥</span> Bénévoles
+          </button>
+        </div>
+        <div class="nav-section" id="nav-volunteer-section" style="display:none">
+          <div class="nav-section-title">Mon espace</div>
+          <button class="nav-item" onclick="showPage('my-missions')" id="nav-my-missions">
+            <span class="icon">🎯</span> Mes missions
+          </button>
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="avatar" id="user-avatar">?</div>
+          <div>
+            <div class="user-name" id="user-name">—</div>
+            <div class="user-role" id="user-role">—</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" style="width:100%" onclick="handleLogout()">
+          🚪 Se déconnecter
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Tableau de bord</h1>
+            <p class="page-subtitle">Vue d'ensemble de votre activité</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('event-modal')" id="btn-create-event">
+            + Créer un événement
+          </button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value" id="stat-events">0</div>
+            <div class="stat-label">Événements</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="stat-volunteers">0</div>
+            <div class="stat-label">Bénévoles</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">📍</div>
+            <div class="stat-value" id="stat-positions">0</div>
+            <div class="stat-label">Postes</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" id="stat-assignments">0</div>
+            <div class="stat-label">Affectations</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Événements récents</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Date</th>
+                  <th>Lieu</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="events-table-body">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div> Chargement...</div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÉVÉNEMENTS -->
+      <div class="page" id="page-events">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Événements</h1>
+            <p class="page-subtitle">Gérez tous vos événements sportifs</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('event-modal')">
+            + Nouvel événement
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Dates</th>
+                  <th>Lieu</th>
+                  <th>Statut</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="events-list-body">
+                <tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- DETAIL ÉVÉNEMENT -->
+      <div class="page" id="page-event-detail">
+        <div class="breadcrumb">
+          <a onclick="showPage('events')">Événements</a>
+          <span>›</span>
+          <span id="detail-breadcrumb">—</span>
+        </div>
+        <div class="event-detail-header">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+            <div>
+              <h1 class="page-title" id="detail-name">—</h1>
+              <div class="event-meta">
+                <div class="event-meta-item">📅 <span id="detail-dates">—</span></div>
+                <div class="event-meta-item">📍 <span id="detail-location">—</span></div>
+                <div class="event-meta-item" id="detail-status-wrap"></div>
+              </div>
+              <p style="margin-top:12px;color:var(--text2);font-size:14px" id="detail-description"></p>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-secondary btn-sm" onclick="editCurrentEvent()">✏️ Modifier</button>
+              <select class="btn btn-secondary btn-sm" onchange="updateEventStatus(this.value)" id="status-select" style="cursor:pointer">
+                <option value="draft">Brouillon</option>
+                <option value="published">Publié</option>
+                <option value="completed">Terminé</option>
+                <option value="archived">Archivé</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" onclick="showTab('tab-positions')">📍 Postes</button>
+          <button class="tab" onclick="showTab('tab-volunteers')">👥 Bénévoles</button>
+          <button class="tab" onclick="showTab('tab-planning')">📋 Planning</button>
+        </div>
+
+        <!-- TAB POSTES -->
+        <div class="tab-content active" id="tab-positions">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+            <button class="btn btn-primary" onclick="openModal('position-modal')">+ Nouveau poste</button>
+          </div>
+          <div id="positions-list"><div class="loading"><div class="spinner"></div></div></div>
+        </div>
+
+        <!-- TAB BÉNÉVOLES -->
+        <div class="tab-content" id="tab-volunteers">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+            <button class="btn btn-primary" onclick="openModal('add-volunteer-modal')">+ Ajouter un bénévole</button>
+          </div>
+          <div class="card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Notes</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="event-volunteers-body">
+                  <tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB PLANNING -->
+        <div class="tab-content" id="tab-planning">
+          <div id="planning-content"><div class="loading"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- BÉNÉVOLES GLOBAL -->
+      <div class="page" id="page-volunteers">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Bénévoles</h1>
+            <p class="page-subtitle">Tous les comptes bénévoles</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Actif</th></tr>
+              </thead>
+              <tbody id="volunteers-list-body">
+                <tr><td colspan="4"><div class="loading"><div class="spinner"></div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MES MISSIONS (bénévole) -->
+      <div class="page" id="page-my-missions">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Mes missions</h1>
+            <p class="page-subtitle">Vos affectations et horaires</p>
+          </div>
+        </div>
+        <div id="my-missions-content"><div class="loading"><div class="spinner"></div></div></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Modal Événement -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="event-modal-title">Nouvel événement</h2>
+      <button class="modal-close" onclick="closeModal('event-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="event-modal-error" class="error-msg"></div>
+      <input type="hidden" id="event-id">
+      <div class="form-group">
+        <label>Nom de l'événement *</label>
+        <input type="text" id="event-name" placeholder="Ex: SwimRun Verdon 2027">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="event-description" placeholder="Description de l'événement..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Lieu</label>
+        <input type="text" id="event-location" placeholder="Ex: Gorges du Verdon, Alpes-de-Haute-Provence">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label>Date de début *</label>
+          <input type="date" id="event-start-date">
+        </div>
+        <div class="form-group">
+          <label>Date de fin</label>
+          <input type="date" id="event-end-date">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('event-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveEvent()" id="save-event-btn">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Poste -->
+<div class="modal-overlay" id="position-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="position-modal-title">Nouveau poste</h2>
+      <button class="modal-close" onclick="closeModal('position-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="position-modal-error" class="error-msg"></div>
+      <input type="hidden" id="position-id">
+      <div class="form-group">
+        <label>Nom du poste *</label>
+        <input type="text" id="position-name" placeholder="Ex: Ravitaillement KM 15">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="position-description" placeholder="Description des missions..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Lieu / Zone</label>
+        <input type="text" id="position-location" placeholder="Ex: Entrée du village, parking principal">
+      </div>
+      <div class="form-group">
+        <label>Bénévoles requis</label>
+        <input type="number" id="position-volunteers-required" value="1" min="1" max="100">
+      </div>
+      <hr style="border-color:var(--border);margin:20px 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <label style="margin:0">Créneaux horaires</label>
+        <button class="btn btn-secondary btn-sm" onclick="addShiftRow()">+ Créneau</button>
+      </div>
+      <div id="shifts-container"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('position-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="savePosition()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Ajouter bénévole à événement -->
+<div class="modal-overlay" id="add-volunteer-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Ajouter un bénévole</h2>
+      <button class="modal-close" onclick="closeModal('add-volunteer-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="add-vol-error" class="error-msg"></div>
+      <div class="form-group">
+        <label>Sélectionner un bénévole</label>
+        <select id="add-volunteer-select">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notes (optionnel)</label>
+        <input type="text" id="add-volunteer-notes" placeholder="Compétences particulières, remarques...">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('add-volunteer-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="addVolunteerToEvent()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Affecter bénévole à créneau -->
+<div class="modal-overlay" id="assign-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Affecter un bénévole</h2>
+      <button class="modal-close" onclick="closeModal('assign-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="assign-error" class="error-msg"></div>
+      <input type="hidden" id="assign-shift-id">
+      <p style="color:var(--text2);font-size:14px;margin-bottom:16px" id="assign-shift-info"></p>
+      <div class="form-group">
+        <label>Bénévole</label>
+        <select id="assign-volunteer-select">
+          <option value="">— Choisir —</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('assign-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveAssignment()">Affecter</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ===== CONFIG SUPABASE =====
+const SUPABASE_URL = 'https://xsqvxwbixkjcdnoqrorf.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzcXZ4d2JpeGtqY2Rub3Fyb3JmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDU5NDAsImV4cCI6MjA4ODM4MTk0MH0.pluxVx-oet7vbLdrgqt8-sibdIdGwkYMJSnGORkpOh8';
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ===== STATE =====
+let currentUser = null;
+let currentProfile = null;
+let currentEventId = null;
+let currentEvent = null;
+
+// ===== INIT =====
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    await loadUserProfile(session.user);
+    showApp();
+  }
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN') {
+      await loadUserProfile(session.user);
+      showApp();
+    } else if (event === 'SIGNED_OUT') {
+      showLoginPage();
+    }
+  });
+}
+
+async function loadUserProfile(user) {
+  currentUser = user;
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+  currentProfile = profile;
+  updateUserUI();
+}
+
+function updateUserUI() {
+  if (!currentProfile) return;
+  const name = `${currentProfile.first_name} ${currentProfile.last_name}`.trim() || currentUser.email;
+  document.getElementById('user-name').textContent = name;
+  document.getElementById('user-role').textContent = currentProfile.role;
+  document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+  // Adapter nav selon le rôle
+  const isVolunteer = currentProfile.role === 'volunteer';
+  document.getElementById('nav-organizer-section').style.display = isVolunteer ? 'none' : '';
+  document.getElementById('nav-volunteer-section').style.display = isVolunteer ? '' : 'none';
+  document.getElementById('btn-create-event').style.display = isVolunteer ? 'none' : '';
+}
+
+// ===== AUTH =====
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Connexion...';
+
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>Se connecter</span>';
+
+  if (error) {
+    errEl.textContent = 'Email ou mot de passe incorrect';
+    errEl.style.display = 'block';
+  }
+}
+
+async function handleLogout() {
+  await sb.auth.signOut();
+}
+
+document.getElementById('login-password').addEventListener('keypress', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// ===== NAVIGATION =====
+function showApp() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadDashboard();
+}
+
+function showLoginPage() {
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  currentUser = null;
+  currentProfile = null;
+}
+
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${pageId}`)?.classList.add('active');
+  document.getElementById(`nav-${pageId}`)?.classList.add('active');
+
+  if (pageId === 'dashboard') loadDashboard();
+  else if (pageId === 'events') loadEventsList();
+  else if (pageId === 'volunteers') loadVolunteersList();
+  else if (pageId === 'my-missions') loadMyMissions();
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+  const { data: events } = await sb.from('events').select('id');
+  const { data: vols } = await sb.from('profiles').select('id').eq('role', 'volunteer');
+  const { data: pos } = await sb.from('positions').select('id');
+  const { data: asgn } = await sb.from('assignments').select('id');
+
+  document.getElementById('stat-events').textContent = events?.length || 0;
+  document.getElementById('stat-volunteers').textContent = vols?.length || 0;
+  document.getElementById('stat-positions').textContent = pos?.length || 0;
+  document.getElementById('stat-assignments').textContent = asgn?.length || 0;
+
+  await loadEventsTable('events-table-body');
+}
+
+async function loadEventsTable(tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  const { data: events, error } = await sb.from('events').select('*').order('start_date', { ascending: false });
+
+  if (!events || events.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📅</div><p>Aucun événement</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = events.map(e => `
+    <tr>
+      <td><strong style="cursor:pointer;color:var(--accent2)" onclick="openEventDetail('${e.id}')">${e.name}</strong></td>
+      <td>${formatDate(e.start_date)}${e.end_date ? ' → ' + formatDate(e.end_date) : ''}</td>
+      <td>${e.location || '—'}</td>
+      <td>${statusBadge(e.status)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-secondary btn-sm" onclick="openEventDetail('${e.id}')">👁 Voir</button>
+          <button class="btn btn-secondary btn-sm" onclick="openEditEvent('${e.id}')">✏️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ===== EVENTS LIST =====
+async function loadEventsList() {
+  await loadEventsTable('events-list-body');
+}
+
+// ===== EVENT DETAIL =====
+async function openEventDetail(eventId) {
+  currentEventId = eventId;
+  showPage('event-detail');
+  document.getElementById('nav-events').classList.add('active');
+
+  const { data: event } = await sb.from('events').select('*').eq('id', eventId).single();
+  currentEvent = event;
+
+  document.getElementById('detail-breadcrumb').textContent = event.name;
+  document.getElementById('detail-name').textContent = event.name;
+  document.getElementById('detail-dates').textContent = formatDate(event.start_date) + (event.end_date ? ' → ' + formatDate(event.end_date) : '');
+  document.getElementById('detail-location').textContent = event.location || 'Lieu non défini';
+  document.getElementById('detail-status-wrap').innerHTML = statusBadge(event.status);
+  document.getElementById('detail-description').textContent = event.description || '';
+  document.getElementById('status-select').value = event.status;
+
+  // Reset tabs
+  showTab('tab-positions', false);
+  loadPositions();
+}
+
+function showTab(tabId, loadData = true) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId)?.classList.add('active');
+  event?.target?.classList.add('active');
+
+  // Fix: find the right tab button
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t => {
+    if (t.getAttribute('onclick')?.includes(tabId)) t.classList.add('active');
+  });
+
+  if (!loadData) return;
+  if (tabId === 'tab-positions') loadPositions();
+  else if (tabId === 'tab-volunteers') loadEventVolunteers();
+  else if (tabId === 'tab-planning') loadPlanning();
+}
+
+async function updateEventStatus(status) {
+  if (!currentEventId) return;
+  const { error } = await sb.from('events').update({ status }).eq('id', currentEventId);
+  if (!error) {
+    currentEvent.status = status;
+    document.getElementById('detail-status-wrap').innerHTML = statusBadge(status);
+    toast('Statut mis à jour', 'success');
+  }
+}
+
+// ===== SAVE EVENT =====
+async function saveEvent() {
+  const id = document.getElementById('event-id').value;
+  const name = document.getElementById('event-name').value.trim();
+  const description = document.getElementById('event-description').value.trim();
+  const location = document.getElementById('event-location').value.trim();
+  const start_date = document.getElementById('event-start-date').value;
+  const end_date = document.getElementById('event-end-date').value;
+  const errEl = document.getElementById('event-modal-error');
+
+  errEl.style.display = 'none';
+  if (!name || !start_date) {
+    errEl.textContent = 'Le nom et la date de début sont obligatoires';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const payload = { name, description, location, start_date, end_date: end_date || null };
+
+  let error;
+  if (id) {
+    ({ error } = await sb.from('events').update(payload).eq('id', id));
+  } else {
+    payload.created_by = currentUser.id;
+    payload.status = 'draft';
+    const { data, error: err } = await sb.from('events').insert(payload).select().single();
+    error = err;
+    // Ajouter l'organisateur
+    if (!error && data) {
+      await sb.from('event_organizers').insert({ event_id: data.id, user_id: currentUser.id });
+    }
+  }
+
+  if (error) {
+    errEl.textContent = error.message.includes('unique') ? 'Cet événement existe déjà (même nom et date)' : error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  closeModal('event-modal');
+  toast(id ? 'Événement modifié' : 'Événement créé', 'success');
+  loadDashboard();
+  if (currentEventId) openEventDetail(currentEventId);
+}
+
+function openEditEvent(eventId) {
+  openModal('event-modal');
+  sb.from('events').select('*').eq('id', eventId).single().then(({ data }) => {
+    document.getElementById('event-modal-title').textContent = 'Modifier l\'événement';
+    document.getElementById('save-event-btn').textContent = 'Enregistrer';
+    document.getElementById('event-id').value = data.id;
+    document.getElementById('event-name').value = data.name;
+    document.getElementById('event-description').value = data.description || '';
+    document.getElementById('event-location').value = data.location || '';
+    document.getElementById('event-start-date').value = data.start_date;
+    document.getElementById('event-end-date').value = data.end_date || '';
+  });
+}
+
+function editCurrentEvent() {
+  if (currentEventId) openEditEvent(currentEventId);
+}
+
+// ===== POSITIONS =====
+async function loadPositions() {
+  const container = document.getElementById('positions-list');
+  const { data: positions } = await sb.from('positions').select('*, shifts(*)').eq('event_id', currentEventId).order('created_at');
+
+  if (!positions || positions.length === 0) {
+    container.innerHTML = `<div class="card"><div class="empty-state"><div class="empty-icon">📍</div><p>Aucun poste créé</p></div></div>`;
+    return;
+  }
+
+  container.innerHTML = positions.map(pos => `
+    <div class="position-card" style="margin-bottom:12px">
+      <div class="position-header">
+        <div>
+          <div class="position-name">${pos.name}</div>
+          ${pos.location ? `<div style="font-size:12px;color:var(--text3);margin-top:2px">📍 ${pos.location}</div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:var(--text2)">👥 ${pos.volunteers_required} requis</span>
+          <button class="btn btn-secondary btn-sm" onclick="openEditPosition('${pos.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePosition('${pos.id}')">🗑</button>
+        </div>
+      </div>
+      ${pos.description ? `<div style="padding:12px 20px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border)">${pos.description}</div>` : ''}
+      ${pos.shifts && pos.shifts.length > 0 ? pos.shifts.map(sh => `
+        <div class="shift-row">
+          <div class="shift-time">🕐 ${formatDateTime(sh.start_time)} → ${formatDateTime(sh.end_time)}</div>
+          ${sh.instructions ? `<div style="font-size:12px;color:var(--text3);flex:1">${sh.instructions}</div>` : ''}
+          <button class="btn btn-secondary btn-sm" onclick="openAssignModal('${sh.id}', '${pos.name}', '${formatDateTime(sh.start_time)}')">+ Affecter</button>
+        </div>
+      `).join('') : `<div style="padding:12px 20px;font-size:13px;color:var(--text3)">Aucun créneau défini</div>`}
+    </div>
+  `).join('');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  // Reset si création
+  if (id === 'event-modal') {
+    document.getElementById('event-modal-title').textContent = 'Nouvel événement';
+    document.getElementById('save-event-btn').textContent = 'Créer';
+    document.getElementById('event-id').value = '';
+    document.getElementById('event-name').value = '';
+    document.getElementById('event-description').value = '';
+    document.getElementById('event-location').value = '';
+    document.getElementById('event-start-date').value = '';
+    document.getElementById('event-end-date').value = '';
+    document.getElementById('event-modal-error').style.display = 'none';
+  }
+  if (id === 'position-modal') {
+    document.getElementById('position-id').value = '';
+    document.getElementById('position-name').value = '';
+    document.getElementById('position-description').value = '';
+    document.getElementById('position-location').value = '';
+    document.getElementById('position-volunteers-required').value = '1';
+    document.getElementById('shifts-container').innerHTML = '';
+    document.getElementById('position-modal-error').style.display = 'none';
+    addShiftRow();
+  }
+  if (id === 'add-volunteer-modal') loadAvailableVolunteers();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// Fermer modal en cliquant dehors
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+function addShiftRow() {
+  const container = document.getElementById('shifts-container');
+  const div = document.createElement('div');
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:10px;align-items:end';
+  div.innerHTML = `
+    <div><label style="font-size:11px">Début</label><input type="datetime-local"></div>
+    <div><label style="font-size:11px">Fin</label><input type="datetime-local"></div>
+    <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()" style="margin-bottom:0">✕</button>
+  `;
+  container.appendChild(div);
+}
+
+async function savePosition() {
+  const id = document.getElementById('position-id').value;
+  const name = document.getElementById('position-name').value.trim();
+  const description = document.getElementById('position-description').value.trim();
+  const location = document.getElementById('position-location').value.trim();
+  const volunteers_required = parseInt(document.getElementById('position-volunteers-required').value) || 1;
+  const errEl = document.getElementById('position-modal-error');
+
+  errEl.style.display = 'none';
+  if (!name) {
+    errEl.textContent = 'Le nom du poste est obligatoire';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const payload = { name, description, location, volunteers_required, event_id: currentEventId };
+
+  let posId = id;
+  if (id) {
+    await sb.from('positions').update(payload).eq('id', id);
+  } else {
+    const { data } = await sb.from('positions').insert(payload).select().single();
+    posId = data?.id;
+  }
+
+  // Sauvegarder les créneaux
+  if (posId && !id) {
+    const shiftRows = document.getElementById('shifts-container').children;
+    for (const row of shiftRows) {
+      const inputs = row.querySelectorAll('input[type="datetime-local"]');
+      if (inputs[0].value && inputs[1].value) {
+        await sb.from('shifts').insert({
+          position_id: posId,
+          start_time: inputs[0].value,
+          end_time: inputs[1].value
+        });
+      }
+    }
+  }
+
+  closeModal('position-modal');
+  toast('Poste enregistré', 'success');
+  loadPositions();
+}
+
+async function openEditPosition(posId) {
+  const { data: pos } = await sb.from('positions').select('*').eq('id', posId).single();
+  openModal('position-modal');
+  document.getElementById('position-modal-title').textContent = 'Modifier le poste';
+  document.getElementById('position-id').value = pos.id;
+  document.getElementById('position-name').value = pos.name;
+  document.getElementById('position-description').value = pos.description || '';
+  document.getElementById('position-location').value = pos.location || '';
+  document.getElementById('position-volunteers-required').value = pos.volunteers_required;
+  document.getElementById('shifts-container').innerHTML = '';
+}
+
+async function deletePosition(posId) {
+  if (!confirm('Supprimer ce poste et tous ses créneaux ?')) return;
+  await sb.from('positions').delete().eq('id', posId);
+  toast('Poste supprimé', 'success');
+  loadPositions();
+}
+
+// ===== VOLUNTEERS =====
+async function loadEventVolunteers() {
+  const tbody = document.getElementById('event-volunteers-body');
+  const { data } = await sb.from('event_volunteers')
+    .select('*, profiles(first_name, last_name, role), users:profiles(id)')
+    .eq('event_id', currentEventId);
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div><p>Aucun bénévole</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = data.map(ev => `
+    <tr>
+      <td>${ev.profiles?.first_name || ''} ${ev.profiles?.last_name || ''}</td>
+      <td style="color:var(--text2);font-size:13px">—</td>
+      <td>${roleBadge(ev.profiles?.role)}</td>
+      <td style="color:var(--text2);font-size:13px">${ev.notes || '—'}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="removeVolunteer('${ev.id}')">Retirer</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function loadAvailableVolunteers() {
+  // Charger tous les profils sauf ceux déjà dans l'event
+  const { data: existing } = await sb.from('event_volunteers').select('user_id').eq('event_id', currentEventId);
+  const existingIds = existing?.map(e => e.user_id) || [];
+
+  const { data: profiles } = await sb.from('profiles').select('*').order('last_name');
+  const available = profiles?.filter(p => p.id !== currentUser.id && !existingIds.includes(p.id)) || [];
+
+  const select = document.getElementById('add-volunteer-select');
+  select.innerHTML = '<option value="">— Choisir —</option>' +
+    available.map(p => `<option value="${p.id}">${p.first_name} ${p.last_name} (${p.role})</option>`).join('');
+}
+
+async function addVolunteerToEvent() {
+  const userId = document.getElementById('add-volunteer-select').value;
+  const notes = document.getElementById('add-volunteer-notes').value.trim();
+  const errEl = document.getElementById('add-vol-error');
+
+  if (!userId) {
+    errEl.textContent = 'Veuillez sélectionner un bénévole';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const { error } = await sb.from('event_volunteers').insert({ event_id: currentEventId, user_id: userId, notes });
+  if (error) {
+    errEl.textContent = 'Erreur lors de l\'ajout';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  closeModal('add-volunteer-modal');
+  toast('Bénévole ajouté', 'success');
+  loadEventVolunteers();
+}
+
+async function removeVolunteer(evId) {
+  if (!confirm('Retirer ce bénévole de l\'événement ?')) return;
+  await sb.from('event_volunteers').delete().eq('id', evId);
+  toast('Bénévole retiré', 'success');
+  loadEventVolunteers();
+}
+
+// ===== PLANNING =====
+async function loadPlanning() {
+  const container = document.getElementById('planning-content');
+  const { data: positions } = await sb.from('positions')
+    .select('*, shifts(*, assignments(*, profiles(first_name, last_name)))')
+    .eq('event_id', currentEventId)
+    .order('created_at');
+
+  if (!positions || positions.length === 0) {
+    container.innerHTML = `<div class="card"><div class="empty-state"><div class="empty-icon">📋</div><p>Aucun poste dans cet événement</p></div></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="planning-grid">` + positions.map(pos => `
+    <div class="position-card">
+      <div class="position-header">
+        <div class="position-name">📍 ${pos.name}</div>
+        <span style="font-size:12px;color:var(--text2)">👥 ${pos.volunteers_required} requis</span>
+      </div>
+      ${pos.shifts && pos.shifts.length > 0 ? pos.shifts.map(sh => {
+        const assigned = sh.assignments || [];
+        const remaining = pos.volunteers_required - assigned.length;
+        return `
+          <div class="shift-row">
+            <div class="shift-time">🕐 ${formatDateTime(sh.start_time)} → ${formatDateTime(sh.end_time)}</div>
+            <div class="shift-volunteers">
+              ${assigned.map(a => `<span class="volunteer-chip">${a.profiles?.first_name || ''} ${a.profiles?.last_name || ''}</span>`).join('')}
+              ${[...Array(Math.max(0, remaining))].map(() => `<span class="volunteer-chip empty">Poste libre</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('') : `<div style="padding:12px 20px;color:var(--text3);font-size:13px">Aucun créneau</div>`}
+    </div>
+  `).join('') + `</div>`;
+}
+
+// ===== ASSIGN =====
+async function openAssignModal(shiftId, posName, shiftTime) {
+  document.getElementById('assign-shift-id').value = shiftId;
+  document.getElementById('assign-shift-info').textContent = `${posName} — ${shiftTime}`;
+  document.getElementById('assign-error').style.display = 'none';
+
+  // Charger les bénévoles de l'event
+  const { data: evVols } = await sb.from('event_volunteers')
+    .select('user_id, profiles(first_name, last_name)')
+    .eq('event_id', currentEventId);
+
+  // Exclure ceux déjà affectés à ce créneau
+  const { data: existing } = await sb.from('assignments').select('user_id').eq('shift_id', shiftId);
+  const existingIds = existing?.map(a => a.user_id) || [];
+
+  const available = evVols?.filter(v => !existingIds.includes(v.user_id)) || [];
+  const select = document.getElementById('assign-volunteer-select');
+  select.innerHTML = '<option value="">— Choisir —</option>' +
+    available.map(v => `<option value="${v.user_id}">${v.profiles?.first_name || ''} ${v.profiles?.last_name || ''}</option>`).join('');
+
+  openModal('assign-modal');
+}
+
+async function saveAssignment() {
+  const shiftId = document.getElementById('assign-shift-id').value;
+  const userId = document.getElementById('assign-volunteer-select').value;
+  const errEl = document.getElementById('assign-error');
+
+  if (!userId) {
+    errEl.textContent = 'Veuillez sélectionner un bénévole';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const { error } = await sb.from('assignments').insert({
+    shift_id: shiftId,
+    user_id: userId,
+    assigned_by: currentUser.id
+  });
+
+  if (error) {
+    errEl.textContent = 'Erreur lors de l\'affectation';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  closeModal('assign-modal');
+  toast('Bénévole affecté', 'success');
+  loadPlanning();
+  loadPositions();
+}
+
+// ===== VOLUNTEERS LIST =====
+async function loadVolunteersList() {
+  const tbody = document.getElementById('volunteers-list-body');
+  const { data: profiles } = await sb.from('profiles').select('*').order('last_name');
+
+  if (!profiles || profiles.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">👥</div><p>Aucun utilisateur</p></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = profiles.map(p => `
+    <tr>
+      <td><strong>${p.first_name} ${p.last_name}</strong></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text2)">${p.id.substring(0, 8)}...</td>
+      <td>${roleBadge(p.role)}</td>
+      <td><span style="color:${p.is_active ? 'var(--green)' : 'var(--red)'}">${p.is_active ? '✅ Actif' : '❌ Inactif'}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ===== MY MISSIONS =====
+async function loadMyMissions() {
+  const container = document.getElementById('my-missions-content');
+  const { data: assignments } = await sb.from('assignments')
+    .select('*, shifts(start_time, end_time, instructions, positions(name, location, event_id, events(name)))')
+    .eq('user_id', currentUser.id)
+    .order('assigned_at', { ascending: false });
+
+  if (!assignments || assignments.length === 0) {
+    container.innerHTML = `<div class="card"><div class="empty-state"><div class="empty-icon">🎯</div><p>Aucune mission assignée</p></div></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="planning-grid">` + assignments.map(a => {
+    const shift = a.shifts;
+    const pos = shift?.positions;
+    return `
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div style="font-weight:600">${pos?.name || 'Poste inconnu'}</div>
+            <div style="font-size:12px;color:var(--text3)">${pos?.events?.name || ''}</div>
+          </div>
+          <span class="badge badge-${a.status}">${a.status}</span>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <div class="event-meta-item">🕐 ${formatDateTime(shift?.start_time)} → ${formatDateTime(shift?.end_time)}</div>
+            ${pos?.location ? `<div class="event-meta-item">📍 ${pos.location}</div>` : ''}
+          </div>
+          ${shift?.instructions ? `<div style="margin-top:12px;padding:12px;background:var(--bg2);border-radius:8px;font-size:13px;color:var(--text2)">${shift.instructions}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('') + '</div>';
+}
+
+// ===== UTILS =====
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDateTime(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+function statusBadge(status) {
+  const labels = { draft: 'Brouillon', published: 'Publié', completed: 'Terminé', archived: 'Archivé' };
+  return `<span class="badge badge-${status}">${labels[status] || status}</span>`;
+}
+
+function roleBadge(role) {
+  const labels = { admin: 'Admin', organizer: 'Organisateur', volunteer: 'Bénévole' };
+  return `<span class="badge badge-${role}">${labels[role] || role}</span>`;
+}
+
+function toast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span> ${message}`;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ===== START =====
+init();
+</script>
+</body>
+</html>
