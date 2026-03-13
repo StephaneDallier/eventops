@@ -6,7 +6,7 @@
 <title>PeakEvents</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -24,7 +24,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text1);font
 .l-brand img{width:32px;height:32px;border-radius:8px;object-fit:cover}
 .l-hero{position:relative;min-height:calc(100vh - 65px);display:flex;align-items:flex-end;overflow:hidden}
 .l-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a3829 0%,#2d5a3d 40%,#4a8a6a 70%,#87c4a0 100%);z-index:0}
-.l-hero-img{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=1600&q=80');background-size:cover;background-position:center;z-index:1;opacity:.55}
+.l-hero-img{position:absolute;inset:0;background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80');background-size:cover;background-position:center;z-index:1;opacity:.55}
 .l-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,26,15,.85) 0%,rgba(15,26,15,.3) 50%,transparent 100%);z-index:2}
 .l-hero-content{position:relative;z-index:3;padding:80px 80px;max-width:750px}
 .l-badge{display:inline-flex;align-items:center;background:var(--orange);color:#fff;font-size:12px;font-weight:600;padding:6px 16px;border-radius:20px;margin-bottom:24px}
@@ -614,7 +614,7 @@ async function doLogin(){
   const err=document.getElementById('login-err');
   err.style.display='none';btn.disabled=true;btn.innerHTML='<div class="spinner"></div>';
   const {error}=await sb.auth.signInWithPassword({email,password:pwd});
-  btn.disabled=false;btn.textContent='Se connecter';
+  btn.disabled=false;btn.innerHTML='Se connecter';
   if(error){err.textContent='Email ou mot de passe incorrect';err.style.display='block';}
 }
 
@@ -1151,18 +1151,28 @@ async function retireVol(id){
 }
 
 // INIT
+async function onUserReady(user){
+  CU=user;
+  const {data:p}=await sb.from('profiles').select('*').eq('id',CU.id).single();
+  CP=p;
+  hide('landing');hide('pg-login');hide('pg-register');hide('pg-forgot');
+  show('app','block');
+  updateSidebar();
+  await loadActiveEvent();
+  goPage('dashboard');
+}
+
 async function init(){
   setLogos();
+  // Check session existante d'abord
+  const {data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    await onUserReady(session.user);
+  }
+  // Puis ecouter les changements
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if((event==='SIGNED_IN'||event==='INITIAL_SESSION')&&session?.user){
-      CU=session.user;
-      const {data:p}=await sb.from('profiles').select('*').eq('id',CU.id).single();
-      CP=p;
-      hide('landing');hide('pg-login');hide('pg-register');hide('pg-forgot');
-      show('app','block');
-      updateSidebar();
-      await loadActiveEvent();
-      goPage('dashboard');
+    if(event==='SIGNED_IN'&&session?.user){
+      await onUserReady(session.user);
     }else if(event==='SIGNED_OUT'){
       CU=null;CP=null;
       hide('app');hide('pg-login');hide('pg-register');hide('pg-forgot');
