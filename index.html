@@ -135,20 +135,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text1);font
 
 /* ===== POSTES GRID ===== */
 .postes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.poste-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
-.pc-head{padding:20px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.pc-title{font-size:17px;font-weight:800;margin-bottom:6px}
-.pc-meta{display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--text3)}
-.pc-meta span{display:flex;align-items:center;gap:4px}
-.badge-complet{background:#16a34a;color:#fff;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700}
-.badge-incomplet{background:#fff7ed;color:var(--orange);border:1.5px solid var(--orange);border-radius:20px;padding:3px 13px;font-size:12px;font-weight:700}
-.pc-body{padding:16px 20px}
-.consignes{background:#f8faf8;border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;font-size:13px;color:var(--text2)}
-.consignes-title{font-weight:600;font-size:12px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.ben-title{font-size:12px;font-weight:600;color:var(--text3);margin-bottom:8px}
-.ben-chips{display:flex;flex-wrap:wrap;gap:6px}
-.ben-chip{padding:5px 12px;border-radius:20px;background:#fff;border:1.5px solid var(--border);font-size:13px;font-weight:500}
-.pc-actions{display:flex;gap:6px;padding:12px 20px;border-top:1px solid var(--border);background:#fafafa}
+.poste-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.pc-head{padding:22px 24px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.pc-title{font-size:20px;font-weight:800;margin-bottom:10px;color:var(--text1)}
+.pc-desc{font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.6}
+.pc-meta{display:flex;align-items:center;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--text3);padding:0 24px 16px;border-bottom:1px solid var(--border)}
+.pc-meta span{display:flex;align-items:center;gap:5px}
+.badge-complet{background:#16a34a;color:#fff;border-radius:20px;padding:5px 16px;font-size:13px;font-weight:700;white-space:nowrap}
+.badge-incomplet{background:#fff7ed;color:var(--orange);border:1.5px solid var(--orange);border-radius:20px;padding:4px 15px;font-size:13px;font-weight:700;white-space:nowrap}
+.pc-body{padding:18px 24px;flex:1}
+.consignes{background:#f0fdf4;border-radius:var(--radius-sm);padding:14px;margin-bottom:16px;font-size:13px;color:var(--text2);line-height:1.6}
+.consignes-title{font-weight:700;font-size:13px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ben-title{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:10px}
+.ben-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ben-chip{padding:6px 14px;border-radius:20px;background:#fff;border:1.5px solid var(--border);font-size:14px;font-weight:500;color:var(--text1)}
+.pc-actions{display:flex;gap:8px;padding:14px 24px;border-top:1px solid var(--border);background:#fafafa}
 
 /* ===== TABLE ===== */
 .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
@@ -409,16 +410,40 @@ tr:hover td{background:#fafcfa}
 
         <!-- DASHBOARD -->
         <div class="page active" id="page-dashboard">
-          <div class="page-h" id="dash-event-name">Tableau de bord</div>
-          <div class="page-sub" id="dash-event-desc">Vue d'ensemble de l'evenement</div>
-          <div class="stats-row" id="dash-stats">
-            <div class="stat-card"><div class="stat-label">Postes <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg></div><div class="stat-val" id="ds-postes">—</div><div class="stat-hint" id="ds-postes-hint">chargement...</div></div>
-            <div class="stat-card"><div class="stat-label">Benevoles <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="stat-val" id="ds-vols">—</div><div class="stat-hint" id="ds-vols-hint">chargement...</div></div>
-            <div class="stat-card"><div class="stat-label">Taux de couverture <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div><div class="stat-val" id="ds-taux" style="color:var(--orange)">—</div><div class="stat-progress"><div class="stat-bar" id="ds-bar" style="width:0%"></div></div></div>
-            <div class="stat-card"><div class="stat-label">Postes en alerte <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="stat-val" id="ds-alerte" style="color:var(--orange)">—</div><div class="stat-hint" id="ds-alerte-hint">Besoin de benevoles</div></div>
+          <!-- VUE ADMIN -->
+          <div id="dash-admin" style="display:none">
+            <div class="page-h">Tableau de bord</div>
+            <div class="page-sub" style="margin-bottom:24px">Vue globale de la plateforme</div>
+            <div class="stats-row" style="margin-bottom:24px">
+              <div class="stat-card"><div class="stat-label">Evenements actifs</div><div class="stat-val" id="da-events">—</div></div>
+              <div class="stat-card"><div class="stat-label">Total benevoles</div><div class="stat-val" id="da-vols">—</div></div>
+              <div class="stat-card"><div class="stat-label">Demandes en attente</div><div class="stat-val" id="da-demandes" style="color:var(--orange)">—</div></div>
+              <div class="stat-card"><div class="stat-label">Total affectations</div><div class="stat-val" id="da-asgn">—</div></div>
+            </div>
+            <div class="section-title">Tous les evenements</div>
+            <div class="card"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Dates</th><th>Lieu</th><th>Statut</th><th>Remplissage</th><th>Actions</th></tr></thead><tbody id="da-events-tbody"></tbody></table></div></div>
           </div>
-          <div class="section-title">Apercu des postes</div>
-          <div id="dash-postes-list"></div>
+          <!-- VUE ORGANIZER -->
+          <div id="dash-organizer" style="display:none">
+            <div class="page-h" id="do-title">Tableau de bord</div>
+            <div class="page-sub" style="margin-bottom:24px">Vos evenements assignes</div>
+            <div id="do-events-list"></div>
+          </div>
+          <!-- VUE VOLUNTEER -->
+          <div id="dash-volunteer" style="display:none">
+            <div class="page-h">Bonjour <span id="dv-name"></span> 👋</div>
+            <div class="page-sub" style="margin-bottom:24px">Votre espace benevole</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              <div>
+                <div class="section-title">Mes evenements</div>
+                <div id="dv-events-list"></div>
+              </div>
+              <div>
+                <div class="section-title">Mes missions</div>
+                <div id="dv-missions-list"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- POSTES -->
@@ -720,56 +745,84 @@ async function loadActiveEvent(){
 }
 
 // DASHBOARD
-async function loadDashboard(){
-  if(!CEI)return;
-  const [{data:pos},{data:ev},{data:asgn}]=await Promise.all([
-    sb.from('positions').select('id,name,location,volunteers_required,shifts(id,start_time,end_time,assignments(id))').eq('event_id',CEI).order('name'),
-    sb.from('event_volunteers').select('id').eq('event_id',CEI).eq('status','accepted'),
-    sb.from('assignments').select('id').eq('event_id',CEI)
-  ]);
-  const postes=pos||[];const vols=ev||[];
-  const required=postes.reduce((s,p)=>s+(p.volunteers_required||0),0);
-  const assigned=postes.reduce((s,p)=>s+(p.shifts?.reduce((ss,sh)=>ss+(sh.assignments?.length||0),0)||0),0);
-  const pct=required>0?Math.round(assigned/required*100):0;
-  const alert=postes.filter(p=>{const req=p.volunteers_required||0;const aff=p.shifts?.reduce((s,sh)=>s+(sh.assignments?.length||0),0)||0;return aff<req;}).length;
-  const ok=postes.filter(p=>{const req=p.volunteers_required||0;const aff=p.shifts?.reduce((s,sh)=>s+(sh.assignments?.length||0),0)||0;return req>0&&aff>=req;}).length;
-  document.getElementById('ds-postes').textContent=postes.length;
-  document.getElementById('ds-postes-hint').textContent=`${ok} complets · ${alert} incomplets`;
-  document.getElementById('ds-vols').textContent=vols.length;
-  document.getElementById('ds-vols-hint').textContent=`${assigned} affectations`;
-  document.getElementById('ds-taux').textContent=pct+'%';
-  document.getElementById('ds-bar').style.width=pct+'%';
-  document.getElementById('ds-alerte').textContent=alert;
-  const {data:evData}=await sb.from('events').select('name,description,start_date,end_date,location,status').eq('id',CEI).single();
-  if(evData){document.getElementById('dash-event-name').textContent=evData.name;document.getElementById('dash-event-desc').innerHTML=evData.description||'';}
-  // Postes list
-  const list=document.getElementById('dash-postes-list');
-  list.innerHTML=postes.map(p=>{
-    const req=p.volunteers_required||0;
-    const aff=p.shifts?.reduce((s,sh)=>s+(sh.assignments?.length||0),0)||0;
-    const ok2=req>0&&aff>=req;
-    const t1=p.shifts?.[0]?.start_time?.slice(0,5)||'';
-    const t2=p.shifts?.[0]?.end_time?.slice(0,5)||'';
-    return `<div class="poste-row">
-      <div class="poste-dot ${ok2?'dot-ok':'dot-warn'}"></div>
-      <div class="poste-info">
-        <div class="poste-name">${p.name}</div>
-        <div class="poste-meta">${p.location?p.location+' · ':''}${t1&&t2?t1+'–'+t2:''}</div>
+function renderEventRow(e,showActivate){
+  const req=e.positions?.reduce((s,p)=>s+(p.volunteers_required||0),0)||0;
+  const aff=e.positions?.reduce((s,p)=>s+(p.shifts?.reduce((ss,sh)=>ss+(sh.assignments?.length||0),0)||0),0)||0;
+  const pct=req>0?Math.round(aff/req*100):0;
+  const bc=pct>=80?'#16a34a':pct>=40?'var(--orange)':'#dc2626';
+  return `<tr>
+    <td><strong style="cursor:pointer;color:var(--green)" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\'")}')">${e.name}</strong></td>
+    <td style="font-size:12px;color:var(--text3)">${fd(e.start_date)}</td>
+    <td>${e.location||'—'}</td>
+    <td>${bStatus(e.status)}</td>
+    <td style="min-width:110px"><div class="flex items-center gap-2"><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${bc};border-radius:3px"></div></div><span style="font-size:11px;color:var(--text3)">${pct}%</span></div></td>
+    <td><div class="flex gap-2">
+      ${showActivate?`<button class="btn btn-primary btn-sm" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\'")}')">Voir</button>`:''}
+    </div></td>
+  </tr>`;
+}
+
+function renderEventCard(e, statusLabel){
+  return `<div class="card" style="margin-bottom:12px;padding:18px">
+    <div class="flex justify-between items-center">
+      <div><strong style="font-size:15px;cursor:pointer;color:var(--green)" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\'")}')">
+        ${e.name}</strong>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e.start_date)} ${e.location?'· '+e.location:''}</div>
       </div>
-      <div class="count-pill ${ok2?'pill-ok':'pill-warn'}">${aff}/${req}</div>
-    </div>`;
-  }).join('');
+      ${statusLabel||bStatus(e.status)}
+    </div>
+  </div>`;
+}
+
+async function loadDashboard(){
+  ['dash-admin','dash-organizer','dash-volunteer'].forEach(id=>hide(id));
+  const role=CP?.role;
+  if(role==='admin'){
+    show('dash-admin');
+    const [{data:evts},{data:vols},{data:pending},{data:asgn}]=await Promise.all([
+      sb.from('events').select('*,positions(id,volunteers_required,shifts(id,assignments(id)))').neq('status','archived').order('start_date'),
+      sb.from('profiles').select('id').eq('role','volunteer'),
+      sb.from('event_volunteers').select('id').eq('status','pending'),
+      sb.from('assignments').select('id')
+    ]);
+    document.getElementById('da-events').textContent=evts?.length||0;
+    document.getElementById('da-vols').textContent=vols?.length||0;
+    document.getElementById('da-demandes').textContent=pending?.length||0;
+    document.getElementById('da-asgn').textContent=asgn?.length||0;
+    const tb=document.getElementById('da-events-tbody');
+    if(!evts?.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-ico">📅</div>Aucun evenement</div></td></tr>';return;}
+    tb.innerHTML=evts.map(e=>renderEventRow(e,true)).join('');
+  } else if(role==='organizer'){
+    show('dash-organizer');
+    const {data:myEvts}=await sb.from('event_organizers').select('event_id,events(id,name,start_date,location,status,description,positions(id,volunteers_required,shifts(id,assignments(id))))').eq('user_id',CU.id);
+    const list=document.getElementById('do-events-list');
+    if(!myEvts?.length){list.innerHTML='<div class="card" style="padding:24px"><div class="empty"><div class="empty-ico">📅</div>Aucun evenement assigne</div></div>';return;}
+    list.innerHTML=myEvts.map(r=>renderEventCard(r.events)).join('');
+  } else {
+    show('dash-volunteer');
+    document.getElementById('dv-name').textContent=CP?.first_name||'';
+    const [{data:evVols},{data:missions}]=await Promise.all([
+      sb.from('event_volunteers').select('status,events(id,name,start_date,location,status)').eq('user_id',CU.id).eq('status','accepted'),
+      sb.from('assignments').select('*,shifts(start_time,end_time,positions(name,location))').eq('volunteer_id',CU.id)
+    ]);
+    const eList=document.getElementById('dv-events-list');
+    if(!evVols?.length){eList.innerHTML='<div class="card" style="padding:16px;font-size:13px;color:var(--text3)">Vous ne participez a aucun evenement. <a onclick="goPage('catalogue')" style="color:var(--orange);cursor:pointer;font-weight:600">Voir le catalogue →</a></div>';}
+    else eList.innerHTML=evVols.map(v=>renderEventCard(v.events)).join('');
+    const mList=document.getElementById('dv-missions-list');
+    if(!missions?.length){mList.innerHTML='<div class="card" style="padding:16px;font-size:13px;color:var(--text3)">Aucune mission assignee pour le moment.</div>';}
+    else mList.innerHTML=missions.map(a=>{
+      const sh=a.shifts,pos=sh?.positions;
+      return `<div class="card" style="margin-bottom:8px;padding:14px 16px"><div class="flex justify-between items-center"><div><strong style="font-size:13px">${pos?.name||'—'}</strong>${pos?.location?`<div style="font-size:11px;color:var(--text3)">📍 ${pos.location}</div>`:''}</div>${sh?.start_time?`<span class="badge b-accepted" style="font-size:11px">🕐 ${sh.start_time.slice(0,5)}–${sh.end_time?.slice(0,5)||'?'}</span>`:''}</div></div>`;
+    }).join('');
+  }
 }
 
 // POSTES
 async function loadPostes(){
   if(!CEI)return;
   const grid=document.getElementById('postes-grid');
-  grid.innerHTML='<div class="loading"><div class="spinner"></div></div>';
-  const [{data:postes},{data:evVols}]=await Promise.all([
-    sb.from('positions').select('*,shifts(*,assignments(*,profiles(first_name,last_name)))').eq('event_id',CEI).order('name'),
-    sb.from('event_volunteers').select('user_id,profiles(first_name,last_name)').eq('event_id',CEI).eq('status','accepted')
-  ]);
+  grid.innerHTML='<div style="grid-column:1/-1"><div class="loading"><div class="spinner"></div></div></div>';
+  const {data:postes}=await sb.from('positions').select('*,shifts(*,assignments(*,profiles(first_name,last_name)))').eq('event_id',CEI).order('name');
   if(!postes||!postes.length){grid.innerHTML='<div style="grid-column:1/-1"><div class="empty"><div class="empty-ico">📍</div>Aucun poste cree</div></div>';return;}
   const isAdmin=['admin','organizer'].includes(CP?.role);
   grid.innerHTML=postes.map(p=>{
@@ -782,21 +835,21 @@ async function loadPostes(){
     const shiftId=p.shifts?.[0]?.id;
     return `<div class="poste-card">
       <div class="pc-head">
-        <div>
+        <div style="flex:1">
           <div class="pc-title">${p.name}</div>
-          <div class="pc-meta">
-            ${p.location?`<span>📍 ${p.location}</span>`:''}
-            ${t1&&t2?`<span>🕐 ${t1} – ${t2}</span>`:''}
-            ${req?`<span>👥 ${aff}/${req}</span>`:''}
-          </div>
+          ${p.description?`<div class="pc-desc">${p.description}</div>`:''}
         </div>
         <span class="${ok?'badge-complet':'badge-incomplet'}">${ok?'Complet':'Incomplet'}</span>
       </div>
+      <div class="pc-meta">
+        ${p.location?`<span>📍 ${p.location}</span>`:''}
+        ${t1&&t2?`<span>🕐 ${t1} – ${t2}</span>`:''}
+        ${req?`<span>👥 ${aff}/${req}</span>`:''}
+      </div>
       <div class="pc-body">
         ${p.instructions?`<div class="consignes"><div class="consignes-title">📋 Consignes</div>${p.instructions}</div>`:''}
-        ${p.description&&!p.instructions?`<div style="font-size:13px;color:var(--text2);margin-bottom:12px">${p.description}</div>`:''}
-        ${bens.length?`<div class="ben-title">Benevoles affectes :</div><div class="ben-chips">${bens.map(b=>`<span class="ben-chip">${b?.first_name||''} ${b?.last_name||''}</span>`).join('')}</div>`:''}
-        ${isAdmin&&shiftId?`<button class="btn btn-success btn-sm" style="margin-top:10px" onclick="openAffectModal('${shiftId}')">+ Affecter un benevole</button>`:''}
+        ${bens.length?`<div class="ben-title">Benevoles affectes :</div><div class="ben-chips">${bens.map(b=>`<span class="ben-chip">${b?.first_name||''} ${b?.last_name||''}</span>`).join('')}</div>`:'<div style="font-size:13px;color:var(--text3);font-style:italic">Aucun benevole affecte</div>'}
+        ${isAdmin&&shiftId?`<button class="btn btn-success btn-sm" style="margin-top:14px" onclick="openAffectModal('${shiftId}')">+ Affecter un benevole</button>`:''}
       </div>
       ${isAdmin?`<div class="pc-actions">
         <button class="btn btn-secondary btn-sm" onclick="openEditPoste('${p.id}')">Modifier</button>
