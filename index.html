@@ -1224,16 +1224,19 @@ async function onUserReady(user){
 
 async function init(){
   setLogos();
-  // Check session existante d'abord
+  // Verifier session existante
   const {data:{session}}=await sb.auth.getSession();
   if(session?.user){
+    // Deja connecte : aller direct sur l'app
     await onUserReady(session.user);
+  } else {
+    // Pas connecte : afficher la landing
+    show('landing','flex');
   }
-  // Puis ecouter les changements
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if((event==='SIGNED_IN')&&session?.user){
+    if(event==='SIGNED_IN'&&session?.user){
       await onUserReady(session.user);
-    }else if(event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'&&!session){
+    }else if(event==='SIGNED_OUT'){
       CU=null;CP=null;
       hide('app');hide('pg-login');hide('pg-register');hide('pg-forgot');
       show('landing','flex');
