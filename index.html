@@ -362,12 +362,12 @@ tr:hover td{background:#fafcfa}
         <div id="sb-admin-nav" style="display:none">
           <div class="sb-section">Administration</div>
           <button class="nav-item" id="nav-events" onclick="goPage('events')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             Evenements
           </button>
-          <button class="nav-item" id="nav-all-benevoles" onclick="goPage('all-benevoles')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            Tous les benevoles
+          <button class="nav-item" id="nav-utilisateurs" onclick="goPage('utilisateurs')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Utilisateurs
           </button>
           <button class="nav-item" id="nav-demandes" onclick="goPage('demandes')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -433,7 +433,7 @@ tr:hover td{background:#fafcfa}
         <!-- BENEVOLES (event) -->
         <div class="page" id="page-benevoles">
           <div class="flex justify-between items-center mb-6">
-            <div><div class="page-h">Benevoles</div><div class="page-sub">Annuaire des benevoles inscrits a l'evenement.</div></div>
+            <div><div class="page-h">Benevoles</div><div class="page-sub">Annuaire des benevoles avec competences et affectations.</div></div>
             <button class="btn btn-primary" id="btn-add-vol" onclick="openAddVolModal()" style="display:none">+ Ajouter</button>
           </div>
           <div class="card"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Email</th><th>Telephone</th><th>Competences</th><th>Affectations</th><th>Statut</th><th></th></tr></thead><tbody id="benevoles-tbody"></tbody></table></div></div>
@@ -461,11 +461,17 @@ tr:hover td{background:#fafcfa}
           <div class="card"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Dates</th><th>Lieu</th><th>Statut</th><th>Remplissage</th><th>Actions</th></tr></thead><tbody id="events-tbody"></tbody></table></div></div>
         </div>
 
-        <!-- TOUS BENEVOLES (admin) -->
-        <div class="page" id="page-all-benevoles">
-          <div class="page-h">Tous les benevoles</div>
-          <div class="page-sub">Annuaire global de tous les benevoles inscrits.</div>
-          <div class="card"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Email</th><th>Telephone</th><th>Club</th><th>Competences</th><th>Role</th><th></th></tr></thead><tbody id="all-vol-tbody"></tbody></table></div></div>
+        <!-- UTILISATEURS (admin) -->
+        <div class="page" id="page-utilisateurs">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <div class="page-h">Utilisateurs</div>
+              <div class="page-sub">Gestion des comptes utilisateurs de la plateforme.</div>
+            </div>
+          </div>
+          <div class="card"><div class="table-wrap"><table><thead><tr>
+            <th>Nom</th><th>Email</th><th>Telephone</th><th>Club</th><th>Competences</th><th>Role</th><th>Statut</th><th>Actions</th>
+          </tr></thead><tbody id="utilisateurs-tbody"></tbody></table></div></div>
         </div>
 
         <!-- DEMANDES -->
@@ -692,14 +698,15 @@ function goPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id)?.classList.add('active');
   document.getElementById('nav-'+id)?.classList.add('active');
-  const titles={dashboard:'Tableau de bord',postes:'Postes',benevoles:'Benevoles',planning:'Planning',events:'Evenements','all-benevoles':'Tous les benevoles',demandes:'Demandes','mes-events':'Mes evenements',catalogue:'Catalogue',missions:'Mes missions'};
+  const titles={dashboard:'Tableau de bord',postes:'Postes',benevoles:'Benevoles',planning:'Planning',events:'Evenements',utilisateurs:'Utilisateurs',demandes:'Demandes','mes-events':'Mes evenements',catalogue:'Catalogue',missions:'Mes missions'};
   document.getElementById('topbar-title').textContent=titles[id]||'PeakEvents';
   if(id==='dashboard')loadDashboard();
   else if(id==='postes')loadPostes();
   else if(id==='benevoles')loadBenevoles();
   else if(id==='planning')loadPlanning();
   else if(id==='events')loadEvents();
-  else if(id==='all-benevoles')loadAllBenevoles();
+  
+  else if(id==='utilisateurs')loadUtilisateurs();
   else if(id==='demandes')loadDemandes();
   else if(id==='mes-events')loadMesEvents();
   else if(id==='catalogue')loadCatalogue();
@@ -883,8 +890,9 @@ function renderEvents(evts){
       <td>${e.location||'—'}</td>
       <td>${bStatus(e.status)}</td>
       <td style="min-width:120px"><div class="flex items-center gap-2"><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${bc};border-radius:3px"></div></div><span style="font-size:11px;color:var(--text3)">${pct}%</span></div></td>
-      <td><div class="flex gap-2">${isAdmin?`<button class="btn btn-secondary btn-sm" onclick="openEditEvent('${e.id}')">Modifier</button><button class="btn btn-danger btn-sm" onclick="delEvent('${e.id}')">Suppr.</button>`:''}
-      <button class="btn btn-primary btn-sm" onclick="setActiveEvent('${e.id}','${e.name.replace(/'/g,"\\'")}')">Activer</button></div></td>
+      <td><div class="flex gap-2">${isAdmin?`<button class="btn btn-secondary btn-sm" onclick="openEditEvent('${e.id}')">Modifier</button><button class="btn btn-danger btn-sm" onclick="delEvent('${e.id}')">Suppr.</button>
+        <button class="btn btn-secondary btn-sm" onclick="archiveEvent('${e.id}')">Archiver</button>`:''}
+</div></td>
     </tr>`;
   }).join('');
 }
@@ -913,6 +921,53 @@ async function loadAllBenevoles(){
       <td><button class="btn btn-danger btn-sm" onclick="delBen('${p.id}')">Suppr.</button></td>
     </tr>`;
   }).join('');
+}
+
+// UTILISATEURS
+async function loadUtilisateurs(){
+  const tb=document.getElementById('utilisateurs-tbody');
+  tb.innerHTML='<tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr>';
+  const {data}=await sb.from('profiles').select('*').order('last_name');
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-ico">👥</div>Aucun utilisateur</div></td></tr>';return;}
+  tb.innerHTML=data.map(p=>{
+    const skills=getSkills(p);
+    return `<tr>
+      <td><div class="flex items-center gap-2">
+        <div class="vol-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div><div class="vol-name">${p.first_name||''} ${p.last_name||''}</div>${p.comment?`<div class="vol-sub">${p.comment}</div>`:''}</div>
+      </div></td>
+      <td style="font-size:12px;color:var(--text3)">${p.email||'—'}</td>
+      <td style="font-size:12px">${p.phone||'—'}</td>
+      <td style="font-size:12px">${p.club||'—'}</td>
+      <td>${chips(skills)}</td>
+      <td>
+        <select class="role-select" onchange="changeRole('${p.id}',this.value)" style="padding:4px 8px;border-radius:6px;border:1.5px solid var(--border);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer">
+          <option value="volunteer" ${p.role==='volunteer'?'selected':''}>Benevole</option>
+          <option value="organizer" ${p.role==='organizer'?'selected':''}>Organisateur</option>
+          <option value="admin" ${p.role==='admin'?'selected':''}>Admin</option>
+        </select>
+      </td>
+      <td><span class="badge ${p.is_active?'b-accepted':'b-refused'}">${p.is_active?'Actif':'Inactif'}</span></td>
+      <td><div class="flex gap-2">
+        <button class="btn btn-secondary btn-sm" onclick="toggleActive('${p.id}',${p.is_active})">${p.is_active?'Desactiver':'Activer'}</button>
+        <button class="btn btn-danger btn-sm" onclick="delUser('${p.id}')">Suppr.</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+async function changeRole(uid,role){
+  await sb.from('profiles').update({role}).eq('id',uid);
+  toast('Role mis a jour');
+}
+async function toggleActive(uid,current){
+  await sb.from('profiles').update({is_active:!current}).eq('id',uid);
+  toast(current?'Utilisateur desactive':'Utilisateur active');
+  loadUtilisateurs();
+}
+async function delUser(uid){
+  if(!confirm('Supprimer cet utilisateur ?'))return;
+  await sb.from('profiles').delete().eq('id',uid);
+  toast('Utilisateur supprime');loadUtilisateurs();
 }
 
 // DEMANDES
@@ -1106,6 +1161,11 @@ async function saveEvent(){
   document.getElementById('m-event-title').textContent='Nouvel evenement';
   toast(id?'Evenement mis a jour':'Evenement cree');loadEvents();
 }
+async function archiveEvent(eid){
+  if(!confirm('Archiver cet evenement ?'))return;
+  await sb.from('events').update({status:'archived'}).eq('id',eid);
+  toast('Evenement archive');loadEvents();
+}
 async function delEvent(eid){
   if(!confirm('Supprimer cet evenement ?'))return;
   const {data:sh}=await sb.from('shifts').select('id').eq('event_id',eid);
@@ -1171,9 +1231,9 @@ async function init(){
   }
   // Puis ecouter les changements
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'&&session?.user){
+    if((event==='SIGNED_IN')&&session?.user){
       await onUserReady(session.user);
-    }else if(event==='SIGNED_OUT'){
+    }else if(event==='SIGNED_OUT'||event==='TOKEN_REFRESHED'&&!session){
       CU=null;CP=null;
       hide('app');hide('pg-login');hide('pg-register');hide('pg-forgot');
       show('landing','flex');
