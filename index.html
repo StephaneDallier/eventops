@@ -713,7 +713,7 @@ async function doRegister(){
   if(error){btn.disabled=false;btn.textContent='Creer mon compte';err.textContent=error.message.includes('already')?'Email deja utilise':error.message;err.style.display='block';return;}
   if(data.user){await sb.from('profiles').upsert({id:data.user.id,first_name:fn,last_name:ln,phone,club:club||null,comment:comment||null,skills,role:'volunteer',is_active:true},{onConflict:'id'});}
   btn.disabled=false;btn.textContent='Creer mon compte';
-  ok.innerHTML='Compte cree ! <a onclick="goLogin()" style="color:var(--orange);font-weight:600;cursor:pointer">Se connecter →</a>';ok.style.display='block';
+  ok.innerHTML='Compte cree ! <a onclick="goLogin()" style="color:var(--orange);font-weight:600;cursor:pointer">Se connecter &rarr;</a>';ok.style.display='block';
 }
 
 // LOGOUT
@@ -793,7 +793,7 @@ function renderEventRow(e,showActivate){
   return `<tr>
     <td><strong style="cursor:pointer;color:var(--green)" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\'")}')">${e.name}</strong></td>
     <td style="font-size:12px;color:var(--text3)">${fd(e.start_date)}</td>
-    <td>${e.location||'—'}</td>
+    <td>${e.location||'-'}</td>
     <td>${bStatus(e.status)}</td>
     <td style="min-width:110px"><div class="flex items-center gap-2"><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${bc};border-radius:3px"></div></div><span style="font-size:11px;color:var(--text3)">${pct}%</span></div></td>
     <td><div class="flex gap-2">
@@ -807,7 +807,7 @@ function renderEventCard(e, statusLabel){
     <div class="flex justify-between items-center">
       <div><strong style="font-size:15px;cursor:pointer;color:var(--green)" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\'")}')">
         ${e.name}</strong>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e.start_date)} ${e.location?'· '+e.location:''}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e.start_date)} ${e.location?'&middot; '+e.location:''}</div>
       </div>
       ${statusLabel||bStatus(e.status)}
     </div>
@@ -846,13 +846,13 @@ async function loadDashboard(){
       sb.from('assignments').select('*,shifts(start_time,end_time,positions(name,location))').eq('volunteer_id',CU.id)
     ]);
     const eList=document.getElementById('dv-events-list');
-    if(!evVols?.length){eList.innerHTML='<div class="card" style="padding:16px;font-size:13px;color:var(--text3)">Vous ne participez a aucun evenement. <a onclick="goPage('catalogue')" style="color:var(--orange);cursor:pointer;font-weight:600">Voir le catalogue →</a></div>';}
+    if(!evVols?.length){eList.innerHTML='<div class="card" style="padding:16px;font-size:13px;color:var(--text3)">Vous ne participez a aucun evenement. <a onclick="goPage('catalogue')" style="color:var(--orange);cursor:pointer;font-weight:600">Voir le catalogue &rarr;</a></div>';}
     else eList.innerHTML=evVols.map(v=>renderEventCard(v.events)).join('');
     const mList=document.getElementById('dv-missions-list');
     if(!missions?.length){mList.innerHTML='<div class="card" style="padding:16px;font-size:13px;color:var(--text3)">Aucune mission assignee pour le moment.</div>';}
     else mList.innerHTML=missions.map(a=>{
       const sh=a.shifts,pos=sh?.positions;
-      return `<div class="card" style="margin-bottom:8px;padding:14px 16px"><div class="flex justify-between items-center"><div><strong style="font-size:13px">${pos?.name||'—'}</strong>${pos?.location?`<div style="font-size:11px;color:var(--text3)">📍 ${pos.location}</div>`:''}</div>${sh?.start_time?`<span class="badge b-accepted" style="font-size:11px">🕐 ${sh.start_time.slice(0,5)}–${sh.end_time?.slice(0,5)||'?'}</span>`:''}</div></div>`;
+      return `<div class="card" style="margin-bottom:8px;padding:14px 16px"><div class="flex justify-between items-center"><div><strong style="font-size:13px">${pos?.name||'-'}</strong>${pos?.location?`<div style="font-size:11px;color:var(--text3)">📍 ${pos.location}</div>`:''}</div>${sh?.start_time?`<span class="badge b-accepted" style="font-size:11px">🕐 ${sh.start_time.slice(0,5)}-${sh.end_time?.slice(0,5)||'?'}</span>`:''}</div></div>`;
     }).join('');
   }
 }
@@ -883,7 +883,7 @@ async function loadPostes(){
       </div>
       <div class="pc-meta">
         ${p.location?`<span>📍 ${p.location}</span>`:''}
-        ${t1&&t2?`<span>🕐 ${t1} – ${t2}</span>`:''}
+        ${t1&&t2?`<span>🕐 ${t1} - ${t2}</span>`:''}
         ${req?`<span>👥 ${aff}/${req}</span>`:''}
       </div>
       <div class="pc-body">
@@ -914,10 +914,10 @@ async function loadBenevoles(){
     const p=ev.profiles||{};const skills=getSkills(p);const affs=affMap[ev.user_id]||[];
     return `<tr>
       <td><div class="flex items-center gap-2"><div class="vol-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><div class="vol-name">${p.first_name||''} ${p.last_name||''}</div>${p.comment?`<div class="vol-sub">${p.comment}</div>`:''}</div></div></td>
-      <td style="font-size:12px;color:var(--text3)">${CU.email||'—'}</td>
-      <td style="font-size:12px">${p.phone||'—'}</td>
+      <td style="font-size:12px;color:var(--text3)">${CU.email||'-'}</td>
+      <td style="font-size:12px">${p.phone||'-'}</td>
       <td>${chips(skills)}</td>
-      <td>${affs.map(a=>`<span class="chip chip-affectation">${a}</span>`).join('')||'<span style="color:var(--text3)">—</span>'}</td>
+      <td>${affs.map(a=>`<span class="chip chip-affectation">${a}</span>`).join('')||'<span style="color:var(--text3)">-</span>'}</td>
       <td>${bStatus(ev.status||'accepted')}</td>
       <td><button class="btn btn-danger btn-sm" onclick="retireVol('${ev.id}')">Retirer</button></td>
     </tr>`;
@@ -950,7 +950,7 @@ async function loadPlanning(){
       const l=Math.max(0,sm/totalMin*100).toFixed(2);
       const w=Math.max(1,(em-sm)/totalMin*100).toFixed(2);
       const names=(sh.assignments||[]).map(a=>`${a.profiles?.first_name||''} ${a.profiles?.last_name||''}`).filter(Boolean).join(', ');
-      html+=`<div class="gantt-block" style="left:${l}%;width:${w}%;background:${color}">${sh.start_time.slice(0,5)}–${sh.end_time.slice(0,5)}${names?' · '+names:''}</div>`;
+      html+=`<div class="gantt-block" style="left:${l}%;width:${w}%;background:${color}">${sh.start_time.slice(0,5)}-${sh.end_time.slice(0,5)}${names?' &middot; '+names:''}</div>`;
     });
     html+=`</div></div>`;
   });
@@ -980,7 +980,7 @@ function renderEvents(evts){
     return `<tr>
       <td><strong style="cursor:pointer;color:var(--green)" onclick="setActiveEvent('${e.id}','${e.name.replace(/'/g,"\\'")}')">${e.name}</strong></td>
       <td style="font-size:12px;color:var(--text3)">${fd(e.start_date)}</td>
-      <td>${e.location||'—'}</td>
+      <td>${e.location||'-'}</td>
       <td>${bStatus(e.status)}</td>
       <td style="min-width:120px"><div class="flex items-center gap-2"><div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${bc};border-radius:3px"></div></div><span style="font-size:11px;color:var(--text3)">${pct}%</span></div></td>
       <td><div class="flex gap-2">${isAdmin?`<button class="btn btn-secondary btn-sm" onclick="openEditEvent('${e.id}')">Modifier</button><button class="btn btn-danger btn-sm" onclick="delEvent('${e.id}')">Suppr.</button>
@@ -1006,9 +1006,9 @@ async function loadAllBenevoles(){
     const skills=getSkills(p);
     return `<tr>
       <td><div class="flex items-center gap-2"><div class="vol-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><div class="vol-name">${p.first_name||''} ${p.last_name||''}</div>${p.comment?`<div class="vol-sub">${p.comment}</div>`:''}</div></div></td>
-      <td style="font-size:12px;color:var(--text3)">${p.email||'—'}</td>
-      <td style="font-size:12px">${p.phone||'—'}</td>
-      <td style="font-size:12px">${p.club||'—'}</td>
+      <td style="font-size:12px;color:var(--text3)">${p.email||'-'}</td>
+      <td style="font-size:12px">${p.phone||'-'}</td>
+      <td style="font-size:12px">${p.club||'-'}</td>
       <td>${chips(skills)}</td>
       <td>${bRole(p.role)}</td>
       <td><button class="btn btn-danger btn-sm" onclick="delBen('${p.id}')">Suppr.</button></td>
@@ -1029,9 +1029,9 @@ async function loadUtilisateurs(){
         <div class="vol-avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
         <div><div class="vol-name">${p.first_name||''} ${p.last_name||''}</div>${p.comment?`<div class="vol-sub">${p.comment}</div>`:''}</div>
       </div></td>
-      <td style="font-size:12px;color:var(--text3)">${p.email||'—'}</td>
-      <td style="font-size:12px">${p.phone||'—'}</td>
-      <td style="font-size:12px">${p.club||'—'}</td>
+      <td style="font-size:12px;color:var(--text3)">${p.email||'-'}</td>
+      <td style="font-size:12px">${p.phone||'-'}</td>
+      <td style="font-size:12px">${p.club||'-'}</td>
       <td>${chips(skills)}</td>
       <td>
         <select class="role-select" onchange="changeRole('${p.id}',this.value)" style="padding:4px 8px;border-radius:6px;border:1.5px solid var(--border);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer">
@@ -1072,9 +1072,9 @@ async function loadDemandes(){
     const p=ev.profiles||{};const skills=getSkills(p);
     return `<tr>
       <td><strong>${p.first_name||''} ${p.last_name||''}</strong>${p.comment?`<div class="vol-sub">${p.comment}</div>`:''}</td>
-      <td style="font-size:12px">${p.phone||'—'}</td>
-      <td><strong>${ev.events?.name||'—'}</strong></td>
-      <td style="font-size:12px">${p.club||'—'}</td>
+      <td style="font-size:12px">${p.phone||'-'}</td>
+      <td><strong>${ev.events?.name||'-'}</strong></td>
+      <td style="font-size:12px">${p.club||'-'}</td>
       <td>${chips(skills)}</td>
       <td><div class="flex gap-2"><button class="btn btn-success btn-sm" onclick="handleDemande('${ev.id}','accepted')">Accepter</button><button class="btn btn-danger btn-sm" onclick="handleDemande('${ev.id}','refused')">Refuser</button></div></td>
     </tr>`;
@@ -1099,7 +1099,7 @@ async function loadMesEvents(){
   if(!data||!data.length){c.innerHTML=`<div class="card card-pad" style="padding:24px"><div class="empty"><div class="empty-ico">📅</div>Vous n'etes inscrit a aucun evenement<br><button class="btn btn-primary" style="margin-top:12px" onclick="goPage('catalogue')">Voir le catalogue</button></div></div>`;return;}
   c.innerHTML=data.map(ev=>{
     const e=ev.events;
-    return `<div class="card" style="margin-bottom:12px;padding:20px"><div class="flex justify-between items-center"><div><strong style="font-size:15px">${e?.name||'—'}</strong><div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e?.start_date)} ${e?.location?'· '+e.location:''}</div></div>${bStatus(ev.status)}</div>${ev.status==='accepted'?`<div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\\'")}')">Voir le planning</button></div>`:''}${ev.status==='pending'?`<div style="margin-top:12px"><button class="btn btn-danger btn-sm" onclick="cancelInscription('${ev.id}')">Annuler la demande</button></div>`:''}</div>`;
+    return `<div class="card" style="margin-bottom:12px;padding:20px"><div class="flex justify-between items-center"><div><strong style="font-size:15px">${e?.name||'-'}</strong><div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e?.start_date)} ${e?.location?'&middot; '+e.location:''}</div></div>${bStatus(ev.status)}</div>${ev.status==='accepted'?`<div style="margin-top:12px"><button class="btn btn-primary btn-sm" onclick="setActiveEvent('${e.id}','${(e.name||'').replace(/'/g,"\\'")}')">Voir le planning</button></div>`:''}${ev.status==='pending'?`<div style="margin-top:12px"><button class="btn btn-danger btn-sm" onclick="cancelInscription('${ev.id}')">Annuler la demande</button></div>`:''}</div>`;
   }).join('');
 }
 async function cancelInscription(id){
@@ -1123,7 +1123,7 @@ async function loadCatalogue(){
     else if(st==='accepted')btn='<button class="btn btn-success btn-sm" disabled>Inscrit</button>';
     else if(st==='refused')btn='<button class="btn btn-danger btn-sm" disabled>Refuse</button>';
     else btn=`<button class="btn btn-primary btn-sm" onclick="demandInscription('${e.id}')">Demander a participer</button>`;
-    return `<div class="card" style="margin-bottom:12px;padding:20px"><div class="flex justify-between items-center"><div><strong style="font-size:15px">${e.name}</strong><div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e.start_date)} ${e.location?'· '+e.location:''}</div></div>${btn}</div>${e.description?`<div style="font-size:13px;color:var(--text2);margin-top:8px">${e.description}</div>`:''}</div>`;
+    return `<div class="card" style="margin-bottom:12px;padding:20px"><div class="flex justify-between items-center"><div><strong style="font-size:15px">${e.name}</strong><div style="font-size:12px;color:var(--text3);margin-top:2px">${fd(e.start_date)} ${e.location?'&middot; '+e.location:''}</div></div>${btn}</div>${e.description?`<div style="font-size:13px;color:var(--text2);margin-top:8px">${e.description}</div>`:''}</div>`;
   }).join('');
 }
 async function demandInscription(eid){
@@ -1139,7 +1139,7 @@ async function loadMissions(){
   if(!data||!data.length){c.innerHTML='<div class="card" style="padding:24px"><div class="empty"><div class="empty-ico">🎯</div>Aucune mission assignee</div></div>';return;}
   c.innerHTML=data.map(a=>{
     const sh=a.shifts,pos=sh?.positions;
-    return `<div class="card" style="margin-bottom:12px;padding:20px"><div class="flex justify-between items-center"><div><strong style="font-size:15px">${pos?.name||'—'}</strong><div style="font-size:12px;color:var(--text3);margin-top:2px">${pos?.events?.name||''} ${pos?.location?'· '+pos.location:''}</div></div>${sh?.start_time?`<span class="badge b-accepted">🕐 ${sh.start_time.slice(0,5)} – ${sh.end_time?.slice(0,5)||'?'}</span>`:''}</div>${pos?.instructions?`<div class="consignes" style="margin-top:12px"><div class="consignes-title">📋 Consignes</div>${pos.instructions}</div>`:''}</div>`;
+    return `<div class="card" style="margin-bottom:12px;padding:20px"><div class="flex justify-between items-center"><div><strong style="font-size:15px">${pos?.name||'-'}</strong><div style="font-size:12px;color:var(--text3);margin-top:2px">${pos?.events?.name||''} ${pos?.location?'&middot; '+pos.location:''}</div></div>${sh?.start_time?`<span class="badge b-accepted">🕐 ${sh.start_time.slice(0,5)} - ${sh.end_time?.slice(0,5)||'?'}</span>`:''}</div>${pos?.instructions?`<div class="consignes" style="margin-top:12px"><div class="consignes-title">📋 Consignes</div>${pos.instructions}</div>`:''}</div>`;
   }).join('');
 }
 
@@ -1152,7 +1152,7 @@ function openAffectModal(shiftId){
       const exIds=(ex||[]).map(a=>a.volunteer_id);
       const avail=(evVols||[]).filter(v=>!exIds.includes(v.user_id));
       const sel=document.getElementById('aff-vol-sel');
-      sel.innerHTML='<option value="">— Choisir —</option>'+avail.map(v=>`<option value="${v.user_id}">${v.profiles?.first_name||''} ${v.profiles?.last_name||''}</option>`).join('');
+      sel.innerHTML='<option value="">- Choisir -</option>'+avail.map(v=>`<option value="${v.user_id}">${v.profiles?.first_name||''} ${v.profiles?.last_name||''}</option>`).join('');
       openModal('m-affect');
     });
   });
@@ -1285,7 +1285,7 @@ async function openAddVolModal(){
   const exIds=(existing||[]).map(e=>e.user_id);
   const avail=(profiles||[]).filter(p=>!exIds.includes(p.id));
   const sel=document.getElementById('addv-sel');
-  sel.innerHTML='<option value="">— Choisir —</option>'+avail.map(p=>`<option value="${p.id}">${p.first_name||''} ${p.last_name||''} (${p.role})</option>`).join('');
+  sel.innerHTML='<option value="">- Choisir -</option>'+avail.map(p=>`<option value="${p.id}">${p.first_name||''} ${p.last_name||''} (${p.role})</option>`).join('');
   openModal('m-add-vol');
 }
 async function doAddVol(){
